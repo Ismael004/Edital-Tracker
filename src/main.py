@@ -4,6 +4,7 @@ import time
 
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
+from notifications.email_notifier import enviar_email
 from scraper.ufc_sobral import buscar_ultimos_editais
 from database.db import iniciar_banco, edital_ja_processado, salvar_edital
 from ai.filter import analisar_edital
@@ -31,11 +32,12 @@ def executar_rastreador():
 
             resultado_ia = analisar_edital(titulo, link)
 
-            time.sleep(6)
+            time.sleep(30/2)
 
             if resultado_ia['relevante']:
                 editais_relevantes += 1
                 print(f"Edital relevante! Justificativa: {resultado_ia['justificativa']}")
+                enviar_email(titulo, link, "ismaelsilvaalmeida257@gmail.com")
             else:
                 print("Fora do interesse do usuário.")
 

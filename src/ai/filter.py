@@ -1,5 +1,7 @@
 import os
+import time
 from google import genai
+from google.genai import errors
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -25,27 +27,47 @@ def analisar_edital(titulo, link):
     3. Se responder "SIM", pule uma linha e escreva um resumo de no máximo 2 frases explicando por que eu deveria ler isso.
     """
     
-    try:
-        resposta = cliente.models.generate_content(
-            model='gemini-flash-latest',
-            contents=prompt
-        )
-        texto_resposta = resposta.text.strip()
-        
-        if texto_resposta.upper().startswith("SIM"):
-            return {
-                "relevante": True,
-                "justificativa": texto_resposta[3:].strip() 
-            }
-        else:
-            return {
-                "relevante": False,
-                "justificativa": "Edital ignorado pelo filtro de interesses."
-            }
+    for tentativa in range(5):
+        try:
+            resposta = cliente.models.generate_content(
+                model='gemini-2.5-flash-lite',
+                contents=prompt
+            )
+            texto_resposta = resposta.text.strip()
             
-    except Exception as e:
-        print(f"Erro ao consultar a IA: {e}")
-        return {"relevante": False, "justificativa": "Erro na IA."}
+            if texto_resposta.upper().startswith("SIM"):
+                return {
+                    "relevante": True,
+                    "justificativa": texto_resposta[3:].strip(),
+                    "erro": False
+                }
+            else:
+                return {
+                    "relevante": False,
+                    "justificativa": "Fora do interesse do usuário.",
+                    "erro": False
+                }
+                
+        except errors.APIError as e:
+            erro_str = str(e)
+            if e.code == 429 or "RESOURCE_EXHAUSTED" in erro_str:
+                espera = 15
+                
+                import re
+                match = re.search(r'retry in ([\d\.]+)s', erro_str)
+                if match:
+                    espera = int(float(match.group(1))) + 2
+                    
+                print(f"\n   ⏳ O Google pediu para esperar. Pausando por {espera} segundos... (Tentativa {tentativa+1}/5)")
+                time.sleep(espera)
+            else:
+                print(f"   ❌ Erro na API do Google: {e}")
+                return {"relevante": False, "justificativa": "Erro na IA.", "erro": True}
+        except Exception as e:
+             print(f"   ❌ Erro desconhecido: {e}")
+             return {"relevante": False, "justificativa": "Erro na IA.", "erro": True}
+                
+    return {"relevante": False, "justificativa": "Muitos erros de limite. Desistindo deste edital.", "erro": True}
 
 if __name__ == "__main__":
     print("Testando o Cérebro da IA...\n")
