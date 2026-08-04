@@ -1,87 +1,81 @@
 import os
+import json
 import time
+import re
+import pprint
 from google import genai
 from google.genai import errors
 from dotenv import load_dotenv
 
 load_dotenv()
 
-cliente = genai.Client()
+modelo_id = 'gemini-3.1-flash-lite'
 
-def analisar_edital(titulo, link):
+def analisar_editais(lista_editais):
+    if not lista_editais:
+        print("Nenhum edital para analisar.")
+        return []
+
+    try:
+        cliente = genai.Client()
+    except Exception as erro:
+        print(f"Erro ao inicializar o cliente: {erro}")
+        return []
+
+    textos_editais = ""
+
+    for i, edital in enumerate(lista_editais):
+        textos_editais += f"[{i}] Título: {edital['título']} | Link: {edital['link']}\n"
+
+    prompt = f"""   
+    Perfil do Estudante: Engenharia Elétrica, focado em tecnologia, programação, estágios, bolsas de pesquisa, inovação e transferência.
+    
+    Editais encontrados:
+    {textos_editais}
+    
+    TAREFA:
+    Avalie os editais acima e selecione os que têm alta chance de interesse para o perfil.
+    Retorne APENAS um array JSON. Se nenhum for interessante, retorne [].
+    
+    Formato OBRIGATÓRIO:
+    [
+      {{
+        "titulo": "titulo exato do edital",
+        "link": "link exato",
+        "justificativa": "1 frase curta explicando o interesse"
+      }}
+    ]
     """
-    Envia o título do edital para a IA e pede para ela julgar se é interessante.
-    """
-    
-    prompt = f"""
-    Você é meu assistente pessoal acadêmico. 
-    O meu perfil: Sou estudante de Engenharia Elétrica, me interesso por tecnologia, 
-    programação, estágios, bolsas de pesquisa, inovação e transferência de curso.
-    
-    Acabei de encontrar este edital no site da universidade:
-    Título: "{titulo}"
-    
-    Sua tarefa:
-    1. Avalie se este edital tem alta chance de ser do meu interesse.
-    2. Responda APENAS "SIM" se for do meu interesse, ou "NAO" se for irrelevante (como cardápios de RU, editais de humanas, etc).
-    3. Se responder "SIM", pule uma linha e escreva um resumo de no máximo 2 frases explicando por que eu deveria ler isso.
-    """
-    
-    for tentativa in range(5):
+
+    for tentativa in range(3):
         try:
-            resposta = cliente.models.generate_content(
-                model='gemini-2.5-flash-lite',
-                contents=prompt
-            )
+            resposta = cliente.models.generate_content(model = modelo_id, contents = prompt)
             texto_resposta = resposta.text.strip()
             
-            if texto_resposta.upper().startswith("SIM"):
-                return {
-                    "relevante": True,
-                    "justificativa": texto_resposta[3:].strip(),
-                    "erro": False
-                }
-            else:
-                return {
-                    "relevante": False,
-                    "justificativa": "Fora do interesse do usuário.",
-                    "erro": False
-                }
-                
-        except errors.APIError as e:
-            erro_str = str(e)
-            if e.code == 429 or "RESOURCE_EXHAUSTED" in erro_str:
-                espera = 15
-                
-                import re
-                match = re.search(r'retry in ([\d\.]+)s', erro_str)
-                if match:
-                    espera = int(float(match.group(1))) + 2
-                    
-                print(f"\n   ⏳ O Google pediu para esperar. Pausando por {espera} segundos... (Tentativa {tentativa+1}/5)")
-                time.sleep(espera)
-            else:
-                print(f"   ❌ Erro na API do Google: {e}")
-                return {"relevante": False, "justificativa": "Erro na IA.", "erro": True}
-        except Exception as e:
-             print(f"   ❌ Erro desconhecido: {e}")
-             return {"relevante": False, "justificativa": "Erro na IA.", "erro": True}
-                
-    return {"relevante": False, "justificativa": "Muitos erros de limite. Desistindo deste edital.", "erro": True}
+            if texto_resposta.startswith("```json"):
+                texto_resposta = texto_resposta[7:]
+            if texto_resposta.endswith("```"):
+                texto_resposta = texto_resposta[:-3]
+            
+            texto_resposta = texto_resposta.strip()
+            
+            editais_filtrados = json.loads(texto_resposta)
+            return editais_filtrados
 
-if __name__ == "__main__":
-    print("Testando o Cérebro da IA...\n")
-    
-    edital_teste_1 = "Resultado Preliminar do Edital de Bolsas de Iniciação Científica em Robótica"
-    edital_teste_2 = "Resultado da Prestação de Contas do Auxílio Moradia – 2º trimestre"
-    
-    print(f"Avaliando: {edital_teste_1}")
-    resultado_1 = analisar_edital(edital_teste_1, "link-falso")
-    print(f"Relevante? {resultado_1['relevante']}")
-    print(f"Por quê? {resultado_1['justificativa']}\n")
-    print("-" * 40)
-    
-    print(f"Avaliando: {edital_teste_2}")
-    resultado_2 = analisar_edital(edital_teste_2, "link-falso")
-    print(f"Relevante? {resultado_2['relevante']}")
-    print(f"Por quê? {resultado_2['justificativa']}")
+        except Exception as e:
+            erro_str = str(e).lower()
+            if "429" in erro_str or "quota" in erro_str or "exhausted" in erro_str:
+                tempo_espera = 15 
+               
+                match = re.search(r'retry in (\d+(\.\d+)?)s', erro_str)
+                if match:
+                    tempo_espera = int(float(match.group(1))) + 2 
+                time.sleep(tempo_espera)
+            else:
+
+                print(f"Erro crítico na IA (Não é limite): {e}")
+                return []
+                
+    print("Falha na IA após todas as tentativas. Retornando vazio.")
+    return None
+            

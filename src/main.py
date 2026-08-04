@@ -1,48 +1,63 @@
-import sys 
+import sys
 import os
-import time
 
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
-from notifications.email_notifier import enviar_email
 from scraper.ufc_sobral import buscar_ultimos_editais
 from database.db import iniciar_banco, edital_ja_processado, salvar_edital
-from ai.filter import analisar_edital
+from ai.filter import analisar_editais
+from notifications.email_notifier import enviar_relatorio_email
 
 def executar_rastreador():
-    print("1. Iniciar o Edital Tracker")
+    print("Iniciando o Edital-Tracker...")
+    print("-" * 50)
+    
     iniciar_banco()
-
+    
+    print("Buscando editais no site da UFC Sobral...")
     editais = buscar_ultimos_editais()
-    novos_editais = 0
-    editais_relevantes = 0
+    
+    if not editais:
+        print("Nenhum edital encontrado no site (ou falha no raspador).")
+        return
 
+    editais_ineditos = []
     for edital in editais:
-        titulo = edital['título']
-        link = edital['link']
-
-        if edital_ja_processado(link):
-            print(f"2. ❌ O edital '{titulo}' já foi processado anteriormente.")
-
+        if edital_ja_processado(edital['link']):
+            print(f"Ignorando (já visto): {edital.get('título', 'Sem Título')}")
         else:
-            print(f"2. ✅ Novo edital encontrado: '{titulo}'")
+            print(f"NOVO ENCONTRADO: {edital.get('título', 'Sem Título')}")
+            editais_ineditos.append(edital)
 
-            salvar_edital(link)
-            novos_editais += 1
+    print("-" * 50)
+    if not editais_ineditos:
+        print("Nenhuma novidade no site da UFC hoje. Encerrando.")
+        return
+        
+    print(f"Enviando {len(editais_ineditos)} edital(is) para a IA analisar em lote...")
+    editais_aprovados_ia = analisar_editais(editais_ineditos)
+    
+    sucesso_email = False
 
-            resultado_ia = analisar_edital(titulo, link)
+    if editais_aprovados_ia is None:
+        print("A IA falhou ou está indisponível. Ativando PLANO B (Modo Sobrevivência)...")
+        sucesso_email = enviar_relatorio_email(editais_ineditos, modo_sem_ia=True)
+        
+    elif len(editais_aprovados_ia) > 0:
+        print(f"A IA encontrou {len(editais_aprovados_ia)} edital(is) com o seu perfil!")
+        sucesso_email = enviar_relatorio_email(editais_aprovados_ia, modo_sem_ia=False)
+        
+    else:
+        print("A IA julgou que todos os editais novos SÃO IRRELEVANTES para você.")
+        print("Nenhum e-mail será enviado para evitar spam na sua caixa de entrada.")
+        sucesso_email = True 
 
-            time.sleep(30/2)
-
-            if resultado_ia['relevante']:
-                editais_relevantes += 1
-                print(f"Edital relevante! Justificativa: {resultado_ia['justificativa']}")
-                enviar_email(titulo, link, "ismaelsilvaalmeida257@gmail.com")
-            else:
-                print("Fora do interesse do usuário.")
-
-    print(f"\n3. Rastreamento concluído! Total de novos editais encontrados: {novos_editais}")
-
+    if sucesso_email:
+        for edital in editais_ineditos:
+            salvar_edital(edital['link'])
+        print("Progresso salvo no banco de dados. Até amanhã!")
+    else:
+        print("Houve falha no envio do email. Não salvaremos no banco para podermos tentar de novo na próxima execução.")
 
 if __name__ == "__main__":
     executar_rastreador()
