@@ -5,26 +5,31 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-def enviar_relatorio_email(editais, modo_sem_ia = False):
+def enviar_relatorio_email(editais, modo_sem_ia=False):
+    """
+    Constrói e envia um e-mail consolidado (HTML) com todos os editais.
+    Se modo_sem_ia for True, envia uma versão simplificada apenas com os links.
+    """
     if not editais:
-        print("Nenhum edital para enviar.")
         return False
-
+        
     email_remetente = os.getenv("EMAIL_REMETENTE")
     senha_app = os.getenv("SENHA_APP")
-
+    
     if not email_remetente or not senha_app:
-        print("Email ou senha incorretos. Verifique as variáveis de ambiente.")
+        print("ERRO: Email ou Senha de App não configurados.")
         return False
 
     msg = EmailMessage()
+    
     if modo_sem_ia:
-        msg['Subject'] = f"[SISTEMA] {len(editais)} novas notícias (Sem IA justificativa)"
+        msg['Subject'] = f"[SISTEMA] {len(editais)} Novos Editais UFC (IA Indisponível)"
     else:
-        msg['Subject'] = f" Edital Tracker: {len(editais)} novas notícias"
+        msg['Subject'] = f"Edital Tracker: {len(editais)} Novas Oportunidades Selecionadas"
+        
     msg['From'] = email_remetente
     msg['To'] = "ismaelsilvaalmeida257@gmail.com"
-
+    
     if not modo_sem_ia:
         html_content = """
         <html>
@@ -37,14 +42,18 @@ def enviar_relatorio_email(editais, modo_sem_ia = False):
         for edital in editais:
             titulo = edital.get('titulo', edital.get('título', 'Sem Título'))
             justificativa = edital.get('justificativa', 'Relevante para o perfil.')
+            fonte = edital.get('fonte', 'Site Monitorado')
             
             html_content += f"""
             <div style="margin-bottom: 20px;">
                 <h3 style="margin-bottom: 5px;">
                     <a href="{edital.get('link', '#')}" style="color: #1a73e8; text-decoration: none;">{titulo}</a>
                 </h3>
+                <p style="margin: 0 0 5px 0; font-size: 12px; color: #666;">
+                    📍 Fonte: <strong>{fonte}</strong>
+                </p>
                 <p style="margin-top: 0; padding: 10px; background-color: #f8f9fa; border-left: 4px solid #34a853;">
-                    <strong> Por que ler?</strong> {justificativa}
+                    <strong>💡 Por que ler?</strong> {justificativa}
                 </p>
             </div>
             """
@@ -60,7 +69,7 @@ def enviar_relatorio_email(editais, modo_sem_ia = False):
         """
         
         for edital in editais:
-            titulo = edital.get('título', 'Edital Sem Título')
+            titulo = edital.get('título', edital.get('titulo', 'Edital Sem Título'))
             link = edital.get('link', '#')
             
             html_content += f"""

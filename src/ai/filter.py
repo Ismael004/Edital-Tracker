@@ -28,7 +28,7 @@ def analisar_editais(lista_editais):
         textos_editais += f"[{i}] Título: {edital['título']} | Link: {edital['link']}\n"
 
     prompt = f"""   
-    Perfil do Estudante: Engenharia Elétrica, focado em tecnologia, programação, estágios, bolsas de pesquisa, inovação e transferência.
+    Perfil do Estudante: Engenharia Elétrica, focado em tecnologia, programação, estágios, bolsas de pesquisa, inovação e transferência. E também com o foco em auxílio estudantis
     
     Editais encontrados:
     {textos_editais}

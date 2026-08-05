@@ -3,38 +3,54 @@ import os
 
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
-from scraper.ufc_sobral import buscar_ultimos_editais
+from scraper.smart_scraper import buscar_editais_em_qualquer_site
 from database.db import iniciar_banco, edital_ja_processado, salvar_edital
 from ai.filter import analisar_editais
 from notifications.email_notifier import enviar_relatorio_email
 
+FONTES_MONITORADAS = [
+    {"nome": "UFC Sobral - Editais", "url": "https://sobral.ufc.br/"},
+    {"nome": "UFC PRAE (Bolsas)", "url": "https://prae.ufc.br/pt/"}
+]
+
 def executar_rastreador():
-    print("Iniciando o Edital-Tracker...")
+    print("Iniciando o Edital-Tracker Multi-Fontes...")
     print("-" * 50)
     
     iniciar_banco()
     
-    print("Buscando editais no site da UFC Sobral...")
-    editais = buscar_ultimos_editais()
-    
-    if not editais:
-        print("Nenhum edital encontrado no site (ou falha no raspador).")
-        return
-
     editais_ineditos = []
-    for edital in editais:
-        if edital_ja_processado(edital['link']):
-            print(f"Ignorando (já visto): {edital.get('título', 'Sem Título')}")
-        else:
-            print(f"NOVO ENCONTRADO: {edital.get('título', 'Sem Título')}")
-            editais_ineditos.append(edital)
+    
+    for fonte in FONTES_MONITORADAS:
+        print(f"\nVerificando: {fonte['nome']}...")
+        editais_encontrados = buscar_editais_em_qualquer_site(fonte['url'])
+        
+        if not editais_encontrados:
+            print(f"Nada encontrado ou erro em {fonte['nome']}.")
+            continue
+            
+        print(f"{len(editais_encontrados)} possíveis notícias extraídas de {fonte['nome']}.")
+        
+        for edital in editais_encontrados:
+            titulo = edital.get('título', edital.get('titulo', ''))
+            link = edital.get('link', '')
+            
+            if not titulo or not link:
+                continue
+                
+            if edital_ja_processado(link):
+                print(f"⏸Ignorando (já visto): {titulo}")
+            else:
+                print(f"NOVO ENCONTRADO: {titulo}")
+                edital['fonte'] = fonte['nome']
+                editais_ineditos.append(edital)
 
-    print("-" * 50)
+    print("\n" + "-" * 50)
     if not editais_ineditos:
-        print("Nenhuma novidade no site da UFC hoje. Encerrando.")
+        print("Nenhuma novidade inédita nos sites hoje. Encerrando.")
         return
         
-    print(f"Enviando {len(editais_ineditos)} edital(is) para a IA analisar em lote...")
+    print(f"Enviando {len(editais_ineditos)} edital(is) para o Gemini analisar o perfil...")
     editais_aprovados_ia = analisar_editais(editais_ineditos)
     
     sucesso_email = False
@@ -50,7 +66,7 @@ def executar_rastreador():
     else:
         print("A IA julgou que todos os editais novos SÃO IRRELEVANTES para você.")
         print("Nenhum e-mail será enviado para evitar spam na sua caixa de entrada.")
-        sucesso_email = True 
+        sucesso_email = True  
 
     if sucesso_email:
         for edital in editais_ineditos:
