@@ -13,53 +13,69 @@ from apscheduler.schedulers.background import BackgroundScheduler
 
 from dotenv import load_dotenv
 from scraper.smart_scraper import buscar_editais_em_qualquer_site
-from database.db import iniciar_banco, edital_ja_processado, salvar_edital
 from ai.filter import analisar_editais
 from notifications.email_notifier import enviar_relatorio_email
+from database.db import obter_todas_configuracoes_ativas, salvar_oportunidade, edital_ja_processado_para_usuario
 
 load_dotenv()
 meu_email = os.getenv("MEU_EMAIL")
 
-def rotina_diaria_de_buscas():
-    print("Iniciando a varredura automática nos bastidores...")
+def executar_motor_core(user_id: str, sites: list[str]) -> tuple[list, list]:
 
-    usuario_exemplo = {
-        "email": meu_email,
-        "prompt": "Engenharia Elétrica, bolsas, estágios, inovação e tecnologia.",
-        "sites": ["https://sobral.ufc.br/", "https://prae.ufc.br/pt/"]
-    }
-
-    iniciar_banco()
     editais_ineditos = []
+    
+    for site_url in sites:
+        print(f"[{user_id}] Lendo: {site_url}")
+        editais = buscar_editais_em_qualquer_site(site_url)
+        if editais:
+            for e in editais:
+                titulo = e.get('título', e.get('titulo', ''))
+                link = e.get('link', '')
+                if titulo and link and not edital_ja_processado_para_usuario(user_id, link):
+                    e['fonte'] = site_url
+                    editais_ineditos.append(e)
+                    
+    editais_aprovados = []
+    if editais_ineditos:
+        print(f"[{user_id}] Analisando {len(editais_ineditos)} oportunidades na IA...")
+        editais_aprovados = analisar_editais(editais_ineditos) or []
+        
+    return editais_ineditos, editais_aprovados
 
-    for site in usuario_exemplo["sites"]:
-        print(f"Acessando: {site}...")
-        editais = buscar_editais_em_qualquer_site(site)
+def rotina_diaria_de_buscas():
+    print("Iniciando a varredura automática (APScheduler)...")
+    
+    usuarios_ativos = obter_todas_configuracoes_ativas()
 
-        for e in editais:
-            titulo = e.get('título', e.get('titulo', ''))
-            link = e.get('link', '')
-
-            if titulo and link and not edital_ja_processado(link):
-                e['fonte'] = site
-                editais_ineditos.append(e)
-
-    if not editais_ineditos:
-        print("Nenhum edital inédito encontrado hoje.")
+    if not usuarios_ativos:
+        print("Nenhum usuário ativo encontrado no banco.")
         return
 
-    print(f"Encontrados {len(editais_ineditos)} editais inéditos. Analisando com a IA...")
-    editais_aprovados = analisar_editais(editais_ineditos)
+    for config in usuarios_ativos:
+        user_id = config.get('user_id')
+        sites = config.get('target_sites', [])
+        
+        print(f"\n--- Iniciando ciclo para: {user_id} ---")
+        
+        ineditos, aprovados = executar_motor_core(user_id, sites)
 
-    if editais_aprovados:
-        print(f"A IA selecionou {len(editais_aprovados)} editais relevantes. Enviando e-mail...")
-        sucesso = enviar_relatorio_email(editais_aprovados, modo_sem_ia=False)
+        if not ineditos:
+            print(f"[{user_id}] Tudo silencioso. Nenhum edital novo.")
+            continue
 
-        if sucesso:
-            for edital in editais_ineditos:
-                salvar_edital(edital['link'])
+        if aprovados:
+            print(f"[{user_id}] IA aprovou {len(aprovados)}. Preparando e-mail...")
+            sucesso = enviar_relatorio_email(aprovados, modo_sem_ia=False)
 
-    print("E-mail enviado com sucesso e progresso salvo no banco de dados.")
+            if sucesso:
+                for edital in ineditos:
+                    salvar_oportunidade(user_id, edital)
+                print(f"[{user_id}] E-mail enviado. Progresso salvo.")
+        else:
+             print(f"[{user_id}] IA rejeitou todos os {len(ineditos)} novos editais.")
+             # Salva no banco para não processar de novo amanhã
+             for edital in ineditos:
+                  salvar_oportunidade(user_id, edital)
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -94,44 +110,36 @@ class Configuracao_Usuario(BaseModel):
     sites_monitorados: List[str]
     email_notificaticao: str
 
-
 @app.get("/", tags=["Health"])
 def health_check():
     return {"status": "ok", "mensagem": "Motor do Edital Tracker rodando a todo vapor!"}
 
 @app.post("/api/configuracoes", tags=["Configuração"])
 def salvar_configuracoes(config: Configuracao_Usuario):
-    print(f"Configuração recebidas para o usuário {config.usuario_id}")
+    print(f"Configuração recebida para o usuário {config.usuario_id}")
     return {"status": "sucesso", "mensagem": "Configurações salvas (MOCK)"}
 
 @app.post("/api/v1/buscar-agora", tags=["Core System"])
 def forcar_busca_imediata(config: Configuracao_Usuario):
-    print(f"Iniciando varredura ON-DEMAND para {config.usuario_id}...")
-    iniciar_banco()
-    editais_encontrados = []
+    print(f"\n--- Iniciando varredura ON-DEMAND para {config.usuario_id} ---")
+    
+    ineditos, aprovados = executar_motor_core(config.usuario_id, config.sites_monitorados)
 
-    for site_url in config.sites_monitorados:
-        print(f"Lendo: {site_url}")
-        editais = buscar_editais_em_qualquer_site(site_url)
-        if editais:
-            for e in editais:
-                e['fonte'] = site_url
-
-            editais_encontrados.extends(editais)
-
-    if not editais_encontrados:
-        return {"status": "alerta", "mensagem": "Nenhum edital encontrado nesses sites hoje."}
-
-    print(f"Analisando {len(editais_encontrados)} oportunidades no Gemini...")
-    editais_aprovados = analisar_editais(editais_encontrados)
+    if not ineditos:
+        return {"status": "alerta", "mensagem": "Nenhum edital inédito encontrado nesses sites hoje.", "editais": []}
+    
+    for edital in ineditos:
+        salvar_oportunidade(config.usuario_id, edital)
     
     return {
         "status": "sucesso",
-        "quantidade_bruta": len(editais_encontrados),
-        "quantidade_aprovada": len(editais_aprovados) if editais_aprovados else 0,
-        "editais": editais_aprovados or []
+        "quantidade_bruta": len(ineditos),
+        "quantidade_aprovada": len(aprovados),
+        "editais": aprovados
     }
 
 if __name__ == "__main__":
-    print("Ligação a ignição do FastaAPI...")
+    print("Ligando a ignição do FastAPI...")
     uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
+
+

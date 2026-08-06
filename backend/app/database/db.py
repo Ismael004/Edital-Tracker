@@ -1,59 +1,59 @@
-import sqlite3
 import os 
+from supabase import create_client, Client
+from dotenv import load_dotenv
+from typing import List, Dict, Optional
 
-CAMINHO_DB = os.path.join(os.path.dirname(__file__), '..', '..', 'tracker.db')
+load_dotenv()
 
-def conectar():
-    return sqlite3.connect(CAMINHO_DB)
+url: str = os.getenv("SUPABASE_URL")
+key: str = os.getenv("SUPABASE_KEY")
 
-def iniciar_banco():
-    conexao = conectar()
-    cursor = conexao.cursor()
+if not url or not key:
+    print("Aviso: Chaves do Supabase não encontrados no arquivo")
 
-    cursor.execute('''
-        CREATE TABLE IF NOT EXISTS editais_processados (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            link TEXT UNIQUE NOT NULL,
-            data_processamento TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-        )
-    ''')
+supabase: Client = create_client(url, key)
 
-    conexao.commit()
-    conexao.close()
-
-def edital_ja_processado(link):
-    conexao = conectar()
-    cursor = conexao.cursor()
-
-    cursor.execute("SELECT id FROM editais_processados WHERE link = ?", (link,))
-    resultado = cursor.fetchone()
-
-    conexao.close()
-    return resultado is not None
-
-def salvar_edital(link):
-    conexao = conectar()
-    cursor = conexao.cursor()
-
+def obter_todas_configuracoes_ativas() -> List[Dict]:
     try:
-        cursor.execute("INSERT INTO editais_processados (link) VALUES (?)", (link,))
-        conexao.commit()
-    except sqlite3.IntegrityError:
-        pass
-    finally:
-        conexao.close()
+        resposta = supabase.table("user_configs").select("*").eq("email_notifications", True).execute()
+        return resposta.data
+    except Exception as e:
+        print(f"Erro ao puxar configuração do Supabase: {e}")
+        return []
+
+def salvar_oportunidade(user_id: str, oportunidade: Dict) -> bool:
+    try: 
+        dados_para_salvar = {
+            "user_id": user_id,
+            "title": oportunidade.get("titulo", oportunidade.get("título", "Sem título")),
+            "url": oportunidade.get("link", ""),
+            "source_site": oportunidade.get("fonte", "Desconhecido"),
+            "ai_summary": oportunidade.get("justificativa", ""),
+            "status": "new"
+        }
+        supabase.table("discovered_opportunities").upsert(dados_para_salvar, ignore_duplicates=True).execute()
+        return True
+    
+    except Exception as e:
+        if "duplicate key value" not in str(e):
+            print(f"Erro ao salvar oportunidade para {user_id}: {e}")
+        return False
+
+def edital_ja_processado_para_usuario(user_id: str, url: str) -> bool:
+    try:
+        resposta = supabase.table("discovered_opportunities") \
+            .select("id") \
+            .eq("user_id", user_id) \
+            .eq("url", url) \
+            .execute()
+        
+        return len(resposta.data) > 0
+    except Exception as e:
+        print(f"⚠️ Erro ao verificar duplicidade: {e}")
+        return False
 
 if __name__ == "__main__":
-    print("Iniciando o banco de dados...")
-    iniciar_banco()
-    print("✅ Banco de dados 'tracker.db' criado/verificado com sucesso na raiz do projeto!")
-    
-    
-    link_falso = "https://sobral.ufc.br/edital-fake-999"
-    
-    print(f"\n1. O link falso já foi processado? -> {edital_ja_processado(link_falso)}")
-    
-    print("2. Salvando o link falso na memória...")
-    salvar_edital(link_falso)
-    
-    print(f"3. E agora, o link falso já foi processado? -> {edital_ja_processado(link_falso)}")
+    print("Testando conexão com o Supabase...")
+    # Tenta puxar as configurações
+    configs = obter_todas_configuracoes_ativas()
+    print(f"Conexão estabelecida! {len(configs)} configurações ativas encontradas na nuvem.")
