@@ -25,7 +25,7 @@ def limpar_html_para_ia(html, url_base):
             link_completo = urljoin(url_base, link)
             links_uteis.append(f"Texto: {texto} | Link: {link_completo}")
 
-    return "\n".join(links_uteis[:150])
+    return "\n".join(links_uteis[:100])
 
 def buscar_editais_em_qualquer_site(url):
     print(f"Acessando a página: {url}")
