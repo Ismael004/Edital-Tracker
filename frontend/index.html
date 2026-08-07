@@ -4,10 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Edital Tracker | Dashboard Conectado</title>
-    <!-- Tailwind CSS (CDN para MVP) -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <!-- Ícones Phosphor (CDN) -->
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
     
     <script>
@@ -133,8 +131,9 @@ https://prae.ufc.br/pt/</textarea>
 
     <!-- ======== LÓGICA JAVASCRIPT ======== -->
     <script>
-        // 1. Define o endereço base da sua API (onde o FastAPI está rodando)
-        const API_BASE_URL = "https://cuddly-halibut-qwxgx4pq75rfj96-8000.app.github.dev/api/v1";
+        // 1. Endereço base do seu Codespace (Sem a rota específica ainda)
+        const API_BASE_URL = "https://cuddly-halibut-qwxgx4pq75rfj96-8000.app.github.dev";
+        
         // 2. Mapeia os elementos HTML que vamos interagir
         const btnForcarBusca = document.getElementById('btnForcarBusca');
         const corpoTabela = document.getElementById('corpoTabela');
@@ -146,19 +145,17 @@ https://prae.ufc.br/pt/</textarea>
         btnForcarBusca.addEventListener('click', async () => {
             
             // --- A. Preparação dos Dados ---
-            // Coleta o que o usuário digitou nas caixas de texto
             const promptValue = document.getElementById('promptPerfil').value;
             const sitesValue = document.getElementById('listaSites').value;
             
-            // Transforma o texto dos sites (separado por quebra de linha) em um array (lista) real
             const arraySites = sitesValue.split('\n').map(site => site.trim()).filter(site => site !== '');
 
-            // Monta o "JSON" (Objeto) exatamente no formato que a classe `Configuracao_Usuario` do FastAPI espera
+            // CHAVES ATUALIZADAS para bater exatamente com o Pydantic / api/rotas.py
             const payload = {
-                usuario_id: "usuario_mock_001", // Hardcoded temporariamente
-                prompt_perfil: promptValue,
-                sites_monitorados: arraySites,
-                email_notificaticao: "teste@teste.com"
+                user_id: "teste_engenharia_01", 
+                email: "ismaelsilvaalmeida257@gmail.com",
+                target_sites: arraySites,
+                prompt_perfil: promptValue
             };
 
             // --- B. Atualização Visual (Estado de Loading) ---
@@ -184,41 +181,39 @@ https://prae.ufc.br/pt/</textarea>
                 </tr>
             `;
 
-            // --- C. Comunicação Real com o FastAPI (A Mágica) ---
+            // --- C. Comunicação Real com o FastAPI ---
             try {
-                const resposta = await fetch(`${API_BASE_URL}/buscar-agora`, {
-                    method: 'POST',           // Usa o método POST (igual definimos no @app.post)
+                // ROTA ATUALIZADA de acordo com api/rotas.py
+                const resposta = await fetch(`${API_BASE_URL}/api/editais/varredura-ao-vivo`, {
+                    method: 'POST',
                     headers: { 
                         'Content-Type': 'application/json' 
                     },
-                    body: JSON.stringify(payload) // Envia o payload convertido em texto
+                    body: JSON.stringify(payload)
                 });
 
-                // Se o servidor devolver um erro (ex: 500, 422, etc)
                 if (!resposta.ok) {
                     throw new Error(`Erro HTTP: ${resposta.status}`);
                 }
 
-                // Transforma a resposta de texto para um objeto JavaScript legível
                 const dados = await resposta.json();
-                console.log("Resposta do FastAPI recebida com sucesso:", dados);
+                console.log("Resposta da API:", dados);
 
                 // --- D. Atualiza a Tabela com os Resultados Reais ---
-                // Verifica o status que definimos lá no backend ("alerta" ou "sucesso")
-                if (dados.status === "alerta" || !dados.editais || dados.editais.length === 0) {
+                // VARIÁVEIS ATUALIZADAS de acordo com o retorno da api/rotas.py
+                if (dados.status === "alerta" || !dados.resultados_aprovados || dados.resultados_aprovados.length === 0) {
                     exibirMensagemVazia(dados.mensagem || "Nenhuma oportunidade aprovada pela IA desta vez.");
                 } else {
-                    renderizarTabela(dados.editais);
+                    renderizarTabela(dados.resultados_aprovados);
                     statusTabela.className = "px-2.5 py-1 bg-green-100 text-green-700 text-xs font-bold rounded-full";
-                    statusTabela.innerText = `${dados.quantidade_aprovada} Aprovados`;
+                    // Lendo as estatísticas do novo formato
+                    statusTabela.innerText = `${dados.estatisticas.total_aprovados_pela_ia} Aprovados`;
                 }
 
             } catch (erro) {
-                // --- E. Tratamento de Erros de Conexão ---
                 console.error("Falha ao comunicar com o servidor:", erro);
                 exibirErroServidor();
             } finally {
-                // --- F. Retorna o Botão ao Estado Normal ---
                 btnForcarBusca.disabled = false;
                 btnForcarBusca.classList.remove('opacity-75', 'cursor-not-allowed');
                 textoBotaoBusca.innerText = "Forçar Varredura Agora";
@@ -227,20 +222,18 @@ https://prae.ufc.br/pt/</textarea>
         });
 
         // ==========================================
-        // FUNÇÕES AUXILIARES DE RENDERIZAÇÃO DE TELA
+        // FUNÇÕES AUXILIARES DE RENDERIZAÇÃO
         // ==========================================
 
         function renderizarTabela(editais) {
-            corpoTabela.innerHTML = ''; // Limpa o "loading"
+            corpoTabela.innerHTML = ''; 
             
             editais.forEach(edital => {
-                // Tenta pegar os campos, garantindo que não quebre se a IA errar o nome da chave
                 const titulo = edital.titulo || edital.título || 'Oportunidade Sem Título Identificado';
                 const justificativa = edital.justificativa || 'Selecionado com base no cruzamento semântico do seu perfil.';
                 const link = edital.link || '#';
                 const fonte = edital.fonte || 'Origem Desconhecida';
 
-                // Cria uma linha (<tr>) nova para cada edital
                 const tr = document.createElement('tr');
                 tr.className = "hover:bg-slate-50 transition-colors group";
                 
@@ -304,9 +297,8 @@ https://prae.ufc.br/pt/</textarea>
                             <p class="text-sm text-red-600 mt-2 text-left w-full">
                                 <strong>Verifique se:</strong>
                                 <ul class="list-disc list-inside text-left mt-1">
-                                    <li>O arquivo <code>main.py</code> está rodando no terminal.</li>
-                                    <li>A porta <code>8000</code> não está bloqueada pelo Codespaces.</li>
-                                    <li>O endereço <code>${API_BASE_URL}</code> está correto.</li>
+                                    <li>O servidor Python está rodando (<code>uvicorn main:app --reload</code>).</li>
+                                    <li>A porta <code>8000</code> está com visibilidade Pública no Codespaces.</li>
                                 </ul>
                             </p>
                         </div>
