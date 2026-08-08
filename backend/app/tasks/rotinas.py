@@ -1,4 +1,5 @@
-from services.controlador_principal import extrair_brutos
+# Importações atualizadas: removemos o extrair_brutos e puxamos direto o coletor
+from services.coletor_dados import executar_coleta_e_triagem
 from services.avaliador import analisar_editais_periodico
 from services.disparador_email import enviar_relatorio_email
 from database.db import obter_todas_configuracoes_ativas, salvar_oportunidade, edital_ja_processado_para_usuario
@@ -15,7 +16,7 @@ def rotina_diaria_de_buscas():
         try:
             # Desempacotamento de dados essenciais
             user_id = config.get('user_id')
-            email_usuario = config.get('email') # Crucial: O e-mail deve vir do banco
+            email_usuario = config.get('email')
             sites = config.get('target_sites', [])
             prompt_banco = config.get('prompt_perfil', 'Oportunidades e editais relevantes') 
             
@@ -25,48 +26,54 @@ def rotina_diaria_de_buscas():
 
             print(f"\n[CRON] --- Alocando thread para usuário: {user_id} ---")
             
-            # FASE 1: Extração Bruta (Apenas puxa do site, sem gastar com IA)
-            brutos_totais = extrair_brutos(user_id, sites)
+            aprovados_globais = []
+            todos_ineditos_do_dia = []
 
-            if not brutos_totais:
-                print(f"[CRON] [{user_id}] Sites monitorados não retornaram dados legíveis.")
-                continue
+            # NOVO FLUXO: Processamento Isolado por Site (Evita IA ignorando dados)
+            for site_url in sites:
+                print(f"[CRON] [{user_id}] Verificando radar: {site_url}")
+                
+                # FASE 1: Extração Bruta Isolada
+                brutos_do_site = executar_coleta_e_triagem(site_url)
 
-            # FASE 2: Barreira de Deduplicação Local (ECONOMIA EXTREMA DE TOKENS)
-            # Nós só enviamos para a IA aquilo que o usuário NUNCA viu.
-            ineditos_reais = []
-            for edital in brutos_totais:
-                link = edital.get('link', '')
-                if link and not edital_ja_processado_para_usuario(user_id, link):
-                    ineditos_reais.append(edital)
-            
-            if not ineditos_reais:
-                print(f"[CRON] [{user_id}] Sem publicações inéditas hoje (Base de dados perfeitamente sincronizada).")
-                continue
+                if not brutos_do_site:
+                    continue
 
-            # FASE 3: Processamento Cognitivo (IA)
-            print(f"[CRON] [{user_id}] {len(ineditos_reais)} novos links encontrados. Acionando a Curadoria do Gemini...")
-            aprovados_reais = analisar_editais_periodico(ineditos_reais, criterio_usuario=prompt_banco)
+                # FASE 2: Barreira de Deduplicação Local (Apenas para este site)
+                ineditos_do_site = []
+                for edital in brutos_do_site:
+                    link = edital.get('link', '')
+                    if link and not edital_ja_processado_para_usuario(user_id, link):
+                        ineditos_do_site.append(edital)
+                        todos_ineditos_do_dia.append(edital) # Guarda para o checkpoint final
+                
+                if not ineditos_do_site:
+                    continue
 
-            # FASE 4: Notificação e Persistência de Estado (Checkpoint)
-            if aprovados_reais:
-                print(f"[CRON] [{user_id}] IA chancelou {len(aprovados_reais)} itens. Injetando no túnel SMTP...")
-                sucesso = enviar_relatorio_email(email_usuario, aprovados_reais, modo_sem_ia=False)
+                # FASE 3: Processamento Cognitivo Focado
+                print(f"[CRON] [{user_id}] {len(ineditos_do_site)} inéditos em {site_url}. Acionando Gemini...")
+                
+                # CORRIGIDO: perfil_usuario no lugar de criterio_usuario
+                aprovados_do_site = analisar_editais_periodico(ineditos_do_site, perfil_usuario=prompt_banco) or []
+                aprovados_globais.extend(aprovados_do_site)
+
+            # FASE 4: Notificação Unificada e Persistência de Estado
+            if aprovados_globais:
+                print(f"[CRON] [{user_id}] IA chancelou um total de {len(aprovados_globais)} itens. Injetando no SMTP...")
+                sucesso = enviar_relatorio_email(email_usuario, aprovados_globais, modo_sem_ia=False)
 
                 if sucesso:
-                    # Salva TUDO no banco (tanto o que a IA aprovou quanto o que rejeitou)
-                    # Se não salvar os rejeitados, amanhã a IA vai gastar token analisando o mesmo lixo de novo
-                    for edital in ineditos_reais:
+                    for edital in todos_ineditos_do_dia:
                         salvar_oportunidade(user_id, edital)
                     print(f"[CRON] [{user_id}] Checkpoint global salvo com sucesso.")
             else:
-                print(f"[CRON] [{user_id}] IA bloqueou todas as {len(ineditos_reais)} novidades por incompatibilidade de perfil.")
-                for edital in ineditos_reais:
-                    salvar_oportunidade(user_id, edital)
-                print(f"[CRON] [{user_id}] Checkpoint salvo (Apenas rejeições).")
+                if todos_ineditos_do_dia:
+                    print(f"[CRON] [{user_id}] IA bloqueou todas as novidades de todos os sites hoje.")
+                    for edital in todos_ineditos_do_dia:
+                        salvar_oportunidade(user_id, edital)
+                else:
+                    print(f"[CRON] [{user_id}] Sem nenhuma publicação inédita hoje (Base de dados perfeitamente sincronizada).")
 
         except Exception as e:
-            # Isolamento Térmico: Se o loop de um usuário quebrar, o except segura o erro 
-            # e o "continue" pula para garantir que o próximo usuário da lista receba o e-mail.
             print(f"[CRON] Falha estrutural ao processar usuário {user_id}: {e}")
             continue

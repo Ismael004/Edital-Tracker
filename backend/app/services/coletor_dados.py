@@ -16,23 +16,25 @@ except ImportError:
 load_dotenv()
 
 def gerar_mapa_otimizado_de_links(html_bruto: str, url_base: str) -> dict:
-
     soup = BeautifulSoup(html_bruto, 'html.parser')
 
-   
-    for tag in soup(['script', 'style', 'header', 'footer', 'nav', 'aside', 'form', 'iframe', 'svg', 'button']):
+    # CORREÇÃO 1: Limpeza cirúrgica. Mantemos nav, aside, header, footer e button vivos!
+    # Apagamos apenas código que não contém texto legível
+    for tag in soup(['script', 'style', 'iframe', 'svg', 'noscript', 'canvas']):
         tag.decompose()
 
     mapa_de_links = {}
     contador_id = 1
     
-    padrao_lixo = re.compile(r'(login|logout|senha|carrinho|checkout|contato|tag|author|category|facebook|instagram)', re.IGNORECASE)
+    padrao_lixo = re.compile(r'(login|logout|senha|carrinho|checkout|contato|tag|author|category|facebook|instagram|twitter|youtube|linkedin)', re.IGNORECASE)
 
     for tag_a in soup.find_all('a', href=True):
         texto_limpo = tag_a.get_text(strip=True)
         link_parcial = tag_a['href']
 
-        if not texto_limpo or len(texto_limpo) < 10 or link_parcial.startswith(('javascript:', '#', 'mailto:', 'tel:')):
+        # CORREÇÃO 2: Reduzido de 10 para 4 caracteres.
+        # Agora siglas curtas como "PIBIC", "PRAE", "Ed.1" não serão mais ignoradas!
+        if not texto_limpo or len(texto_limpo) < 4 or link_parcial.startswith(('javascript:', '#', 'mailto:', 'tel:')):
             continue
             
         if padrao_lixo.search(link_parcial):
@@ -56,7 +58,6 @@ def particionar_dicionario(dicionario: dict, tamanho_lote: int):
     for i in range(0, len(itens), tamanho_lote):
         yield dict(itens[i:i + tamanho_lote])
 
-
 # CAMADA DE REDE (AQUISIÇÃO DE DADOS)
 
 def requisitar_html_estatico(url: str) -> str:
@@ -70,7 +71,6 @@ def requisitar_html_estatico(url: str) -> str:
         return ""
 
 def renderizar_html_dinamico(url: str) -> str:
-    """[MÉTODO FALLBACK] Aciona o headless browser para processar Client-Side Rendering (React, Vue, etc)."""
     if not PLAYWRIGHT_DISPONIVEL:
         print("[REDE] Fallback dinâmico indisponível. Instale o Playwright.")
         return ""
@@ -103,7 +103,7 @@ def executar_coleta_e_triagem(url_alvo: str) -> list:
         documento_html_dinamico = renderizar_html_dinamico(url_alvo)
         if documento_html_dinamico:
             mapa_dados = gerar_mapa_otimizado_de_links(documento_html_dinamico, url_alvo)
-            print(f"[COLETOR] Fallback bem-sucedido. Total indexado: {len(mapa_dados)} nós.")
+            print(f"[COLETOR] Fallback dinâmico bem-sucedido. Total indexado: {len(mapa_dados)} nós.")
 
     if not mapa_dados:
         print("[COLETOR] Nenhum nó de dado viável extraído. Abortando operação para esta URL.")
@@ -121,7 +121,6 @@ def executar_coleta_e_triagem(url_alvo: str) -> list:
     print(f"[COLETOR] {len(mapa_dados)} nós mapeados. Encaminhando para IA em {len(lotes_processamento)} lote(s)...")
 
     for indice, lote_atual in enumerate(lotes_processamento):
-        
         texto_otimizado_para_ia = "\n".join([f"[{id_item}] {dados['titulo']}" for id_item, dados in lote_atual.items()])
         
         prompt_engenharia = f"""
@@ -141,7 +140,7 @@ def executar_coleta_e_triagem(url_alvo: str) -> list:
         try:
             resposta_ia = cliente_ia.chat.completions.create(
                 messages=[{"role": "user", "content": prompt_engenharia}],
-                model="llama-3.1-8b-instant",
+                model="llama-3.3-70b-versatile",
                 temperature=0, 
                 response_format={"type": "json_object"}    
             )
