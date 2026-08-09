@@ -1,9 +1,12 @@
 import json
 import os
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from google import genai
 from google.genai import types
 
 # Lista de prioridade de modelos para mitigação de Rate Limit (Fallback em Cascata)
+# ATENÇÃO: valide estes nomes na documentação oficial do Gemini antes de subir para
+# produção — nomes de modelo inexistentes queimam tentativas e tempo no loop de fallback.
 MODELOS_DISPONIVEIS = [
     'gemini-3.1-flash-lite',
     'gemini-3.5-flash-lite',
@@ -11,97 +14,197 @@ MODELOS_DISPONIVEIS = [
     'gemini-2.5-flash-lite'
 ]
 
+TAMANHO_LOTE_PADRAO = 50   # itens por chamada — evita truncamento de JSON e perda de precisão
+MAX_WORKERS_PADRAO = 5     # lotes processados em paralelo
+TIMEOUT_REQUISICAO_SEGUNDOS = 30
+
+
+# ============================================================
+# FUNÇÕES PÚBLICAS — mantidas como pontos de entrada do sistema
+# ============================================================
+
 def analisar_editais_ao_vivo(editais: list, perfil_usuario: str) -> list:
-    # Validação estrita em tempo real engatilhada manualmente pelo usuário no dashboard
+    """
+    Modo RÍGIDO — disparado manualmente pelo usuário no dashboard.
+    Validação estrita em tempo real: zero inferência, zero tolerância a ambiguidade.
+    """
     if not editais:
         return []
 
-    prompt_sistema = f"""Você é um filtro de testes em tempo real.
-    O usuário está testando a raspagem de dados AGORA com este critério: "{perfil_usuario}"
-    
-    SUA MISSÃO:
-    Seja IMPLACÁVEL. Rejeite qualquer item que não seja exatamente o que o usuário pediu.
-    Não faça deduções lógicas (ex: se pediu Unicamp, rejeite Fuvest e Enem sumariamente).
-    """
-    
+    prompt_sistema = f"""Você é um FILTRO LITERAL de correspondência exata, operando em tempo real para um teste manual do usuário.
+
+CRITÉRIO EXATO DO USUÁRIO (não parafraseie, não reinterprete): "{perfil_usuario}"
+
+REGRAS INEGOCIÁVEIS:
+1. Aprove SOMENTE itens que correspondam de forma DIRETA e EXPLÍCITA ao critério acima.
+2. É PROIBIDO fazer inferência, generalização, associação temática ou dedução lógica.
+   Exemplo: se o critério menciona "Unicamp", REJEITE itens sobre Fuvest, Enem, USP,
+   vestibulares em geral ou qualquer instituição diferente — mesmo que pareçam relacionados.
+3. Na dúvida entre aprovar e rejeitar, REJEITE. Falso negativo é aceitável; falso positivo não é.
+4. Não amplie o escopo do critério com sinônimos, categorias mais amplas ou contexto que
+   o usuário não escreveu explicitamente.
+5. Ignore completamente relevância "de carreira" ou "de estudos" genérica — o único critério
+   válido é a correspondência literal ao texto fornecido pelo usuário.
+
+Sua tarefa é agir como um filtro determinístico: dado o mesmo input, o mesmo critério deve
+sempre produzir o mesmo resultado. Não seja criativo. Não seja útil além do que foi pedido.
+"""
+
     return _processar_via_gemini(editais, prompt_sistema)
+
 
 def analisar_editais_periodico(editais: list, perfil_usuario: str) -> list:
-    # Curadoria estratégica rodando em background para compilação de relatórios diários
+    """
+    Modo CURADOR — roda em background para compilação de relatórios/boletins diários.
+    Mais permissivo: aprova itens que beneficiem o perfil, mesmo que indiretamente.
+    """
     if not editais:
         return []
 
-    prompt_sistema = f"""Você é um curador de oportunidades e editais.
-    Seu objetivo é montar o boletim diário para um usuário com este perfil: "{perfil_usuario}"
-    
-    SUA MISSÃO:
-    Selecione os itens de maior valor para a carreira/estudos do usuário. 
-    Rejeite lixo corporativo ou notícias inúteis, mas aprove oportunidades que claramente beneficiem o perfil descrito, mesmo que indiretamente.
-    """
-    
+    prompt_sistema = f"""Você é um curador especialista de oportunidades e editais, montando o
+boletim diário para um usuário com o seguinte perfil: "{perfil_usuario}"
+
+CRITÉRIOS DE APROVAÇÃO:
+1. Aprove itens que tenham valor DIRETO para a carreira, estudos ou interesses descritos
+   no perfil (correspondência explícita ao tema, área ou instituição mencionada).
+2. Aprove também itens de valor INDIRETO, mas apenas quando a conexão for razoável e
+   defensável — não force relação onde não há. Ex: se o perfil menciona "engenharia elétrica",
+   um edital de "iniciação científica em automação" é indireto-válido; um edital de
+   "bolsa de artes cênicas" não é, mesmo que ambos sejam "oportunidades acadêmicas".
+3. REJEITE lixo corporativo, propaganda, notícias institucionais sem valor prático
+   (aniversário da instituição, evento social interno, etc.).
+4. Cada item aprovado deve receber uma justificativa curta e específica — não genérica —
+   explicando por que ele serve ao perfil descrito.
+
+Seja seletivo: prefira um boletim menor e relevante a um boletim grande e diluído.
+"""
+
     return _processar_via_gemini(editais, prompt_sistema)
 
-def _processar_via_gemini(editais: list, instrucao_base: str) -> list:
-    # Abstração do motor cognitivo: compila o payload, aplica o fallback e força o JSON nativo
-    texto_para_analise = "FRAGMENTOS EXTRAÍDOS DO SITE:\n"
-    for item in editais:
-        titulo = item.get('título', item.get('titulo', 'Sem título'))
-        texto_para_analise += f"- {titulo} | Link: {item.get('link', '')}\n"
 
-    prompt_estrutural = """
-    RETORNO OBRIGATÓRIO:
-    Devolva APENAS uma matriz (lista) JSON contendo os itens aprovados. 
-    Cada objeto da lista DEVE ter exatamente as chaves: "titulo", "link", "justificativa".
-    Não use formatação markdown, não escreva explicações antes ou depois.
-    Se nada atender ao critério, devolva uma lista vazia: []
+# ============================================================
+# NORMALIZAÇÃO E PARTICIONAMENTO
+# ============================================================
+
+def _normalizar_edital(item: dict) -> dict:
+    return {
+        "titulo": item.get('título', item.get('titulo', 'Sem título')),
+        "link": item.get('link', ''),
+        "fonte": item.get('fonte', 'Desconhecida')
+    }
+
+
+def _particionar_lista(itens: list, tamanho_lote: int):
+    for i in range(0, len(itens), tamanho_lote):
+        yield itens[i:i + tamanho_lote]
+
+
+# ============================================================
+# MOTOR COGNITIVO — batching paralelo + fallback em cascata
+# ============================================================
+
+def _montar_texto_lote(lote: list) -> str:
+    linhas = [f"- {item['titulo']} | Link: {item['link']}" for item in lote]
+    return "FRAGMENTOS EXTRAÍDOS DO SITE:\n" + "\n".join(linhas)
+
+
+PROMPT_ESTRUTURAL = """
+RETORNO OBRIGATÓRIO:
+Devolva APENAS uma matriz (lista) JSON contendo os itens aprovados.
+Cada objeto da lista DEVE ter exatamente as chaves: "titulo", "link", "justificativa".
+Não use formatação markdown, não escreva explicações antes ou depois.
+Se nada atender ao critério, devolva uma lista vazia: []
+"""
+
+
+def _chamar_gemini_com_fallback(client: genai.Client, instrucao_base: str, texto_lote: str) -> list:
     """
-
-    chave_api = os.getenv("GEMINI_API_KEY")
-    if not chave_api:
-        print("[SISTEMA] GEMINI_API_KEY não encontrada no ambiente.")
-        return []
-        
-    client = genai.Client(api_key=chave_api)
-    
-    # Trava de hardware lógico do provedor para impossibilitar alucinações de formatação
+    Percorre a cascata de modelos até um responder com JSON válido no formato esperado.
+    Retorna [] se todos falharem (nunca lança exceção para o chamador).
+    """
     config_geracao = types.GenerateContentConfig(
         temperature=0.1,
         response_mime_type="application/json"
     )
 
-    # Loop de resiliência: intercala modelos dinamicamente em caso de falha de cota ou rede
     for modelo in MODELOS_DISPONIVEIS:
         try:
             resposta = client.models.generate_content(
                 model=modelo,
-                contents=[instrucao_base, prompt_estrutural, texto_para_analise],
+                contents=[instrucao_base, PROMPT_ESTRUTURAL, texto_lote],
                 config=config_geracao
             )
 
-            # Extração limpa e garantida pela restrição prévia de MIME type
             resultados = json.loads(resposta.text)
-            
-            # Reconciliação do payload original: resgata a URL matriz do nó processado
-            if resultados and isinstance(resultados, list):
-                for r in resultados:
-                    if not r.get('fonte'):
-                        fonte_original = editais[0].get('fonte', 'Desconhecida')
-                        for edital_bruto in editais:
-                            if edital_bruto.get('link') == r.get('link'):
-                                fonte_original = edital_bruto.get('fonte', 'Desconhecida')
-                                break
-                        r['fonte'] = fonte_original
-            
+
+            # Validação de shape: garante que é lista, não dict/None/string
+            if not isinstance(resultados, list):
+                print(f"[IA] Modelo {modelo} retornou formato inesperado ({type(resultados).__name__}), tentando próximo...")
+                continue
+
             return resultados
 
+        except json.JSONDecodeError as erro:
+            print(f"[IA] JSON malformado do modelo {modelo}: {erro}. Alternando rotas...")
+            continue
         except Exception as erro:
             erro_str = str(erro).lower()
-            if "429" in erro_str or "quota" in erro_str or "exhausted" in erro_str or "rate" in erro_str:
-                print(f"[IA] Rate Limit ou cota esgotada no modelo {modelo}. Engatando fallback...")
-                continue 
+            eh_rate_limit = any(termo in erro_str for termo in ("429", "quota", "exhausted", "rate"))
+            if eh_rate_limit:
+                print(f"[IA] Rate limit / cota esgotada em {modelo}. Engatando fallback...")
             else:
                 print(f"[IA] Anomalia na inferência do modelo {modelo}: {erro}. Alternando rotas...")
-                continue 
-                
-    print("[IA] FALHA CRÍTICA: Esgotamento total do pool de modelos. Abortando operação.")
+            continue
+
+    print("[IA] FALHA CRÍTICA: Esgotamento total do pool de modelos para este lote.")
     return []
+
+
+def _processar_lote(client: genai.Client, instrucao_base: str, lote: list, indice: int) -> list:
+    texto_lote = _montar_texto_lote(lote)
+    resultados = _chamar_gemini_com_fallback(client, instrucao_base, texto_lote)
+    if resultados:
+        print(f"[IA] Lote {indice + 1}: {len(resultados)} item(ns) aprovado(s).")
+    return resultados
+
+
+def _processar_via_gemini(
+    editais: list,
+    instrucao_base: str,
+    tamanho_lote: int = TAMANHO_LOTE_PADRAO,
+    max_workers: int = MAX_WORKERS_PADRAO
+) -> list:
+    chave_api = os.getenv("GEMINI_API_KEY")
+    if not chave_api:
+        print("[SISTEMA] GEMINI_API_KEY não encontrada no ambiente.")
+        return []
+
+    editais_normalizados = [_normalizar_edital(item) for item in editais]
+
+    # Mapa O(1) para reconciliação de fonte — evita busca linear repetida
+    mapa_fonte = {item['link']: item['fonte'] for item in editais_normalizados if item['link']}
+
+    client = genai.Client(api_key=chave_api)
+    lotes = list(_particionar_lista(editais_normalizados, tamanho_lote))
+
+    print(f"[IA] {len(editais_normalizados)} itens em {len(lotes)} lote(s), processando em paralelo (max {max_workers} workers)...")
+
+    resultados_finais = []
+    with ThreadPoolExecutor(max_workers=max_workers) as executor:
+        futuros = {
+            executor.submit(_processar_lote, client, instrucao_base, lote, i): i
+            for i, lote in enumerate(lotes)
+        }
+        for futuro in as_completed(futuros):
+            indice = futuros[futuro]
+            try:
+                resultados_finais.extend(futuro.result())
+            except Exception as erro:
+                print(f"[IA] Falha inesperada no lote {indice + 1}: {erro}")
+
+    # Reconciliação O(1): resgata a fonte original de cada item aprovado
+    for r in resultados_finais:
+        if not r.get('fonte'):
+            r['fonte'] = mapa_fonte.get(r.get('link'), 'Desconhecida')
+
+    return resultados_finais
