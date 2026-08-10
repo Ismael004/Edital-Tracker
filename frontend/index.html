@@ -3,82 +3,161 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Edital Tracker | Dashboard Conectado</title>
+    <title>Edital Tracker — Painel de Varredura</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
-    
+
     <script>
         tailwind.config = {
             theme: {
                 extend: {
-                    fontFamily: { sans: ['Inter', 'sans-serif'] },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        display: ['"Space Grotesk"', 'sans-serif'],
+                        mono: ['"IBM Plex Mono"', 'ui-monospace', 'monospace'],
+                    },
                     colors: {
-                        brand: { 50: '#eff6ff', 100: '#dbeafe', 500: '#3b82f6', 600: '#2563eb', 700: '#1d4ed8' }
+                        ink: { 950: '#0A0F18', 900: '#0F1622', 850: '#121A28', 800: '#151E2E', 700: '#1B2537', 600: '#233047', 500: '#374763' },
+                        copper: { 300: '#F3CD8E', 400: '#E9BA70', 500: '#DDA24B', 600: '#C1852F' },
+                        signal: { 300: '#A6EEE1', 400: '#7FDCC9', 500: '#54C4AF', 600: '#3B9E8C' },
+                        rust: { 400: '#E68A6C', 500: '#D66A48' },
+                        mist: { 400: '#8993AC', 300: '#A3ACC2', 200: '#C7CEDE', 100: '#EDF0F6' },
+                    },
+                    boxShadow: {
+                        panel: '0 1px 0 0 rgba(255,255,255,0.03) inset, 0 12px 32px -16px rgba(0,0,0,0.5)',
                     }
                 }
             }
         }
     </script>
-</head>
-<body class="bg-slate-50 text-slate-800 antialiased h-screen flex flex-col">
 
-    <!-- Cabeçalho Simples -->
-    <header class="bg-white border-b border-slate-200 h-16 flex items-center px-6 shrink-0 shadow-sm">
-        <i class="ph-fill ph-robot text-brand-600 text-2xl mr-3"></i>
-        <span class="font-bold text-lg tracking-tight text-slate-800">Edital Tracker UI</span>
+    <style>
+        :root{
+            --grid-line: rgba(221,162,75,0.06);
+        }
+        body{
+            background-color: #0A0F18;
+            background-image:
+                linear-gradient(var(--grid-line) 1px, transparent 1px),
+                linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+            background-size: 28px 28px;
+        }
+        .font-mono-tight{ letter-spacing: 0.06em; }
+
+        /* LED de status no cabeçalho */
+        .led{
+            width: 8px; height: 8px; border-radius: 999px;
+            background: #4b5a78; box-shadow: 0 0 0 3px rgba(75,90,120,0.15);
+            transition: background .3s ease, box-shadow .3s ease;
+        }
+        .led.is-idle{ background:#4b5a78; box-shadow:0 0 0 3px rgba(75,90,120,0.15); }
+        .led.is-busy{ background:#DDA24B; box-shadow:0 0 0 3px rgba(221,162,75,0.22); animation: blink 1s ease-in-out infinite; }
+        .led.is-ok{ background:#54C4AF; box-shadow:0 0 0 3px rgba(84,196,175,0.22); }
+        .led.is-empty{ background:#8993AC; box-shadow:0 0 0 3px rgba(137,147,172,0.18); }
+        .led.is-error{ background:#D66A48; box-shadow:0 0 0 3px rgba(214,106,72,0.22); animation: blink .7s ease-in-out infinite; }
+        @keyframes blink{ 50%{ opacity:.35; } }
+
+        /* Varredura: feixe animado durante o processamento */
+        #scanSweep{
+            position:absolute; inset:0; overflow:hidden; pointer-events:none;
+            opacity:0; transition: opacity .25s ease;
+        }
+        #scanSweep.active{ opacity:1; }
+        #scanSweep::after{
+            content:''; position:absolute; top:0; bottom:0; width:140px;
+            background: linear-gradient(90deg, transparent, rgba(221,162,75,0.16), transparent);
+            animation: sweep 1.9s linear infinite;
+        }
+        @keyframes sweep{
+            from{ transform: translateX(-160px); }
+            to{ transform: translateX(calc(100% + 160px)); }
+        }
+
+        textarea:focus, input:focus{ outline: none; }
+        .field:focus-within{ border-color:#DDA24B; box-shadow:0 0 0 3px rgba(221,162,75,0.14); }
+
+        a:focus-visible, button:focus-visible{
+            outline: 2px solid #DDA24B; outline-offset: 2px;
+        }
+
+        @media (prefers-reduced-motion: reduce){
+            .led.is-busy, .led.is-error, #scanSweep::after, .animate-spin{ animation: none !important; }
+        }
+    </style>
+</head>
+<body class="text-mist-100 antialiased min-h-screen flex flex-col font-sans">
+
+    <!-- Cabeçalho: barra de instrumento -->
+    <header class="bg-ink-900/90 backdrop-blur border-b border-ink-600 h-16 flex items-center px-6 shrink-0">
+        <div class="flex items-center gap-3">
+            <i class="ph-fill ph-radar text-copper-400 text-2xl"></i>
+            <span class="font-display font-semibold text-lg tracking-tight text-mist-100">Edital Tracker</span>
+            <span class="hidden sm:inline text-mist-400 text-xs font-mono ml-1">/ painel de varredura</span>
+        </div>
+        <div class="ml-auto flex items-center gap-2 font-mono text-xs text-mist-300">
+            <span id="headerLed" class="led is-idle"></span>
+            <span id="headerLedLabel">SISTEMA EM ESPERA</span>
+        </div>
     </header>
 
     <!-- Área Principal de Conteúdo -->
     <main class="flex-1 overflow-y-auto p-6 flex flex-col items-center">
         <div class="w-full max-w-4xl space-y-6">
-            
+
             <!-- Título e Botão de Ação -->
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-ink-850 p-6 rounded-2xl border border-ink-600 shadow-panel">
                 <div>
-                    <h1 class="text-2xl font-bold text-slate-900">Visão Geral</h1>
-                    <p class="text-sm text-slate-500 mt-1">Configure o Agente de IA e realize buscas manuais (On-Demand).</p>
+                    <p class="font-mono text-[11px] text-copper-400 tracking-[0.18em] uppercase mb-1">Busca sob demanda</p>
+                    <h1 class="text-2xl font-display font-semibold text-mist-100">Visão Geral</h1>
+                    <p class="text-sm text-mist-400 mt-1">Configure o agente de IA e dispare uma varredura manual nos sites monitorados.</p>
                 </div>
-                
+
                 <!-- BOTÃO QUE DISPARA A REQUISIÇÃO (Conectado via ID) -->
-                <button id="btnForcarBusca" class="bg-brand-600 hover:bg-brand-700 text-white px-5 py-2.5 rounded-lg text-sm font-semibold shadow-sm transition-all flex items-center justify-center gap-2 min-w-[200px]">
-                    <i class="ph-bold ph-play" id="iconeBotaoBusca"></i> 
-                    <span id="textoBotaoBusca">Forçar Varredura Agora</span>
+                <button id="btnForcarBusca" class="bg-copper-500 hover:bg-copper-600 text-ink-950 px-5 py-2.5 rounded-lg text-sm font-mono font-semibold tracking-wide uppercase shadow-sm transition-all flex items-center justify-center gap-2 min-w-[210px]">
+                    <i class="ph-bold ph-play" id="iconeBotaoBusca"></i>
+                    <span id="textoBotaoBusca">Iniciar Varredura</span>
                 </button>
             </div>
 
             <!-- Formulário de Configuração do Usuário -->
-            <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-                <div class="px-6 py-4 border-b border-slate-200 bg-slate-50/50">
-                    <h2 class="text-lg font-semibold text-slate-800 flex items-center gap-2">
-                        <i class="ph-bold ph-sliders-horizontal text-brand-600"></i> Parâmetros da Busca
-                    </h2>
+            <div class="bg-ink-850 rounded-2xl border border-ink-600 shadow-panel overflow-hidden">
+                <div class="px-6 py-4 border-b border-ink-600 flex items-center gap-2">
+                    <i class="ph-bold ph-sliders-horizontal text-copper-400"></i>
+                    <h2 class="text-sm font-mono font-semibold text-mist-200 tracking-[0.1em] uppercase">Parâmetros da Busca</h2>
                 </div>
-                
+
                 <div class="p-6">
                     <form class="space-y-6" onsubmit="event.preventDefault();">
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <!-- Prompt de Perfil -->
-                            <div>
-                                <label class="block text-sm font-semibold text-slate-700 mb-2">
-                                    <i class="ph ph-brain mr-1"></i> Perfil do Avaliador (Gemini)
-                                </label>
-                                <textarea 
-                                    id="promptPerfil" 
-                                    rows="5" 
-                                    class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500 text-sm resize-none shadow-inner"
+                            <div class="field rounded-lg border border-ink-600 bg-ink-900/60 transition-all">
+                                <div class="flex items-center justify-between px-3 pt-3">
+                                    <label for="promptPerfil" class="flex items-center gap-1.5 text-xs font-mono font-semibold text-mist-300 tracking-wide uppercase">
+                                        <i class="ph ph-brain text-copper-400"></i> Perfil do Avaliador
+                                    </label>
+                                    <span class="text-[10px] font-mono text-signal-400 bg-signal-500/10 border border-signal-500/25 rounded px-1.5 py-0.5">Gemini</span>
+                                </div>
+                                <textarea
+                                    id="promptPerfil"
+                                    rows="5"
+                                    class="w-full px-3 py-2.5 bg-transparent text-sm text-mist-100 resize-none font-mono leading-relaxed placeholder:text-mist-400"
                                 >Engenharia Elétrica, focado em tecnologia, programação, estágios, bolsas de pesquisa, inovação e transferência.</textarea>
                             </div>
-                            
+
                             <!-- Lista de Sites (Um por linha) -->
-                            <div>
-                                <label class="block text-sm font-semibold text-slate-700 mb-2">
-                                    <i class="ph ph-globe mr-1"></i> Sites Monitorados (Groq)
-                                </label>
-                                <textarea 
-                                    id="listaSites" 
-                                    rows="5" 
-                                    class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500 text-sm font-mono resize-none shadow-inner bg-slate-50"
+                            <div class="field rounded-lg border border-ink-600 bg-ink-900/60 transition-all">
+                                <div class="flex items-center justify-between px-3 pt-3">
+                                    <label for="listaSites" class="flex items-center gap-1.5 text-xs font-mono font-semibold text-mist-300 tracking-wide uppercase">
+                                        <i class="ph ph-globe text-copper-400"></i> Sites Monitorados
+                                    </label>
+                                    <span class="text-[10px] font-mono text-copper-400 bg-copper-500/10 border border-copper-500/25 rounded px-1.5 py-0.5">Groq</span>
+                                </div>
+                                <textarea
+                                    id="listaSites"
+                                    rows="5"
+                                    class="w-full px-3 py-2.5 bg-transparent text-sm text-mist-100 font-mono resize-none leading-relaxed placeholder:text-mist-400"
                                     placeholder="Um link por linha..."
                                 >https://sobral.ufc.br/
 https://prae.ufc.br/pt/</textarea>
@@ -88,36 +167,37 @@ https://prae.ufc.br/pt/</textarea>
                 </div>
             </div>
 
-            <!-- Tabela de Resultados Dinâmica -->
-            <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-                <div class="px-6 py-4 border-b border-slate-200 flex items-center justify-between bg-slate-50/50">
-                    <h2 class="text-lg font-semibold text-slate-800 flex items-center gap-2">
-                        <i class="ph-bold ph-list-magnifying-glass text-brand-600"></i> Resultados Aprovados
+            <!-- Log de Resultados Dinâmico -->
+            <div class="bg-ink-850 rounded-2xl border border-ink-600 shadow-panel overflow-hidden relative">
+                <div id="scanSweep"></div>
+                <div class="px-6 py-4 border-b border-ink-600 flex items-center justify-between">
+                    <h2 class="text-sm font-mono font-semibold text-mist-200 tracking-[0.1em] uppercase flex items-center gap-2">
+                        <i class="ph-bold ph-list-magnifying-glass text-copper-400"></i> Resultados Aprovados
                     </h2>
                     <!-- Badge de Status -->
-                    <span id="statusTabela" class="px-2.5 py-1 bg-slate-200 text-slate-700 text-xs font-bold rounded-full">
+                    <span id="statusTabela" class="px-2.5 py-1 bg-ink-700 text-mist-300 text-[11px] font-mono font-semibold tracking-wide uppercase rounded-full border border-ink-600">
                         Aguardando Ação
                     </span>
                 </div>
-                
+
                 <div class="overflow-x-auto">
                     <table class="w-full text-left border-collapse">
                         <thead>
-                            <tr class="bg-slate-100/50 text-slate-500 text-xs uppercase tracking-wider border-b border-slate-200">
+                            <tr class="text-mist-400 text-[11px] font-mono uppercase tracking-[0.1em] border-b border-ink-600">
                                 <th class="px-6 py-3 font-semibold">Oportunidade</th>
                                 <th class="px-6 py-3 font-semibold w-48">Fonte</th>
                                 <th class="px-6 py-3 font-semibold text-center w-32">Status</th>
                                 <th class="px-6 py-3 font-semibold text-right w-32">Ação</th>
                             </tr>
                         </thead>
-                        <tbody id="corpoTabela" class="text-sm divide-y divide-slate-100">
+                        <tbody id="corpoTabela" class="text-sm divide-y divide-ink-700">
                             <!-- O conteúdo aqui será injetado pelo JavaScript -->
                             <tr>
-                                <td colspan="4" class="px-6 py-12 text-center text-slate-500">
+                                <td colspan="4" class="px-6 py-14 text-center">
                                     <div class="flex flex-col items-center justify-center">
-                                        <i class="ph-duotone ph-magnifying-glass text-4xl text-slate-300 mb-2"></i>
-                                        <p class="font-medium text-slate-600">Nenhuma busca realizada ainda.</p>
-                                        <p class="text-xs mt-1">Clique em "Forçar Varredura Agora" para iniciar o fluxo de IAs.</p>
+                                        <i class="ph-duotone ph-magnifying-glass text-4xl text-ink-600 mb-2"></i>
+                                        <p class="font-medium text-mist-300">Nenhuma busca realizada ainda.</p>
+                                        <p class="text-xs mt-1 text-mist-400 font-mono">clique em "iniciar varredura" para ligar o fluxo de IAs</p>
                                     </div>
                                 </td>
                             </tr>
@@ -133,26 +213,34 @@ https://prae.ufc.br/pt/</textarea>
     <script>
         // 1. Endereço base do seu Codespace (Sem a rota específica ainda)
         const API_BASE_URL = "https://cuddly-halibut-qwxgx4pq75rfj96-8000.app.github.dev";
-        
+
         // 2. Mapeia os elementos HTML que vamos interagir
         const btnForcarBusca = document.getElementById('btnForcarBusca');
         const corpoTabela = document.getElementById('corpoTabela');
         const statusTabela = document.getElementById('statusTabela');
         const iconeBotaoBusca = document.getElementById('iconeBotaoBusca');
         const textoBotaoBusca = document.getElementById('textoBotaoBusca');
+        const headerLed = document.getElementById('headerLed');
+        const headerLedLabel = document.getElementById('headerLedLabel');
+        const scanSweep = document.getElementById('scanSweep');
+
+        function definirLed(estado, texto){
+            headerLed.className = 'led ' + estado;
+            headerLedLabel.innerText = texto;
+        }
 
         // 3. Adiciona o evento de clique no botão
         btnForcarBusca.addEventListener('click', async () => {
-            
+
             // --- A. Preparação dos Dados ---
             const promptValue = document.getElementById('promptPerfil').value;
             const sitesValue = document.getElementById('listaSites').value;
-            
+
             const arraySites = sitesValue.split('\n').map(site => site.trim()).filter(site => site !== '');
 
             // CHAVES ATUALIZADAS para bater exatamente com o Pydantic / api/rotas.py
             const payload = {
-                user_id: "teste_engenharia_01", 
+                user_id: "teste_engenharia_01",
                 email: "ismaelsilvaalmeida257@gmail.com",
                 target_sites: arraySites,
                 prompt_perfil: promptValue
@@ -163,18 +251,20 @@ https://prae.ufc.br/pt/</textarea>
             btnForcarBusca.classList.add('opacity-75', 'cursor-not-allowed');
             textoBotaoBusca.innerText = "Processando LLMs...";
             iconeBotaoBusca.className = "ph-bold ph-spinner animate-spin";
-            
-            statusTabela.className = "px-2.5 py-1 bg-blue-100 text-blue-700 text-xs font-bold rounded-full animate-pulse";
+
+            statusTabela.className = "px-2.5 py-1 bg-copper-500/15 text-copper-300 text-[11px] font-mono font-semibold tracking-wide uppercase rounded-full border border-copper-500/30";
             statusTabela.innerText = "IAs Trabalhando...";
-            
+            definirLed('is-busy', 'VARREDURA EM ANDAMENTO');
+            scanSweep.classList.add('active');
+
             corpoTabela.innerHTML = `
                 <tr>
-                    <td colspan="4" class="px-6 py-12 text-center text-brand-600">
+                    <td colspan="4" class="px-6 py-14 text-center">
                         <div class="flex flex-col items-center justify-center gap-3">
-                            <i class="ph-bold ph-spinner animate-spin text-4xl"></i>
+                            <i class="ph-bold ph-spinner animate-spin text-4xl text-copper-400"></i>
                             <div>
-                                <p class="font-semibold text-slate-700">Extraindo dados e analisando perfil...</p>
-                                <p class="text-xs text-slate-500 mt-1">O Groq está lendo o HTML e o Gemini está julgando a relevância. Isso leva alguns segundos.</p>
+                                <p class="font-medium text-mist-200">Extraindo dados e analisando perfil...</p>
+                                <p class="text-xs text-mist-400 mt-1 font-mono">Groq lê o HTML enquanto o Gemini avalia a relevância. Isso leva alguns segundos.</p>
                             </div>
                         </div>
                     </td>
@@ -186,8 +276,8 @@ https://prae.ufc.br/pt/</textarea>
                 // ROTA ATUALIZADA de acordo com api/rotas.py
                 const resposta = await fetch(`${API_BASE_URL}/api/editais/varredura-ao-vivo`, {
                     method: 'POST',
-                    headers: { 
-                        'Content-Type': 'application/json' 
+                    headers: {
+                        'Content-Type': 'application/json'
                     },
                     body: JSON.stringify(payload)
                 });
@@ -205,9 +295,10 @@ https://prae.ufc.br/pt/</textarea>
                     exibirMensagemVazia(dados.mensagem || "Nenhuma oportunidade aprovada pela IA desta vez.");
                 } else {
                     renderizarTabela(dados.resultados_aprovados);
-                    statusTabela.className = "px-2.5 py-1 bg-green-100 text-green-700 text-xs font-bold rounded-full";
+                    statusTabela.className = "px-2.5 py-1 bg-signal-500/15 text-signal-300 text-[11px] font-mono font-semibold tracking-wide uppercase rounded-full border border-signal-500/30";
                     // Lendo as estatísticas do novo formato
                     statusTabela.innerText = `${dados.estatisticas.total_aprovados_pela_ia} Aprovados`;
+                    definirLed('is-ok', 'RESULTADOS ENCONTRADOS');
                 }
 
             } catch (erro) {
@@ -216,8 +307,9 @@ https://prae.ufc.br/pt/</textarea>
             } finally {
                 btnForcarBusca.disabled = false;
                 btnForcarBusca.classList.remove('opacity-75', 'cursor-not-allowed');
-                textoBotaoBusca.innerText = "Forçar Varredura Agora";
+                textoBotaoBusca.innerText = "Iniciar Varredura";
                 iconeBotaoBusca.className = "ph-bold ph-play";
+                scanSweep.classList.remove('active');
             }
         });
 
@@ -226,8 +318,8 @@ https://prae.ufc.br/pt/</textarea>
         // ==========================================
 
         function renderizarTabela(editais) {
-            corpoTabela.innerHTML = ''; 
-            
+            corpoTabela.innerHTML = '';
+
             editais.forEach(edital => {
                 const titulo = edital.titulo || edital.título || 'Oportunidade Sem Título Identificado';
                 const justificativa = edital.justificativa || 'Selecionado com base no cruzamento semântico do seu perfil.';
@@ -235,34 +327,34 @@ https://prae.ufc.br/pt/</textarea>
                 const fonte = edital.fonte || 'Origem Desconhecida';
 
                 const tr = document.createElement('tr');
-                tr.className = "hover:bg-slate-50 transition-colors group";
-                
+                tr.className = "hover:bg-ink-700/40 transition-colors group";
+
                 tr.innerHTML = `
                     <td class="px-6 py-4">
                         <div class="flex items-start gap-3">
                             <div class="mt-1 hidden sm:block">
-                                <i class="ph-duotone ph-file-text text-brand-500 text-xl"></i>
+                                <i class="ph-duotone ph-file-text text-copper-400 text-xl"></i>
                             </div>
                             <div>
-                                <p class="font-medium text-slate-800 text-sm sm:text-base leading-tight">${titulo}</p>
-                                <div class="mt-1.5 p-2 bg-slate-100 rounded text-xs text-slate-600 border-l-2 border-brand-500" title="${justificativa}">
-                                    <span class="font-semibold text-slate-700"><i class="ph-fill ph-magic-wand mr-1 text-brand-500"></i>IA:</span> ${justificativa}
+                                <p class="font-medium text-mist-100 text-sm sm:text-base leading-tight">${titulo}</p>
+                                <div class="mt-1.5 p-2 bg-ink-900/70 rounded text-xs text-mist-300 border-l-2 border-copper-500" title="${justificativa}">
+                                    <span class="font-semibold text-copper-300 font-mono"><i class="ph-fill ph-magic-wand mr-1"></i>IA:</span> ${justificativa}
                                 </div>
                             </div>
                         </div>
                     </td>
                     <td class="px-6 py-4 align-top pt-5">
-                        <span class="inline-flex items-center text-xs font-medium text-slate-500 bg-white border border-slate-200 px-2 py-1 rounded">
-                            <i class="ph ph-link mr-1"></i> ${fonte}
+                        <span class="inline-flex items-center text-xs font-mono text-mist-300 bg-ink-900/60 border border-ink-600 px-2 py-1 rounded">
+                            <i class="ph ph-link mr-1 text-copper-400"></i> ${fonte}
                         </span>
                     </td>
                     <td class="px-6 py-4 text-center align-top pt-5">
-                        <span class="inline-flex items-center gap-1 px-2 py-1 rounded bg-green-50 text-green-700 text-xs font-semibold border border-green-200 shadow-sm">
+                        <span class="inline-flex items-center gap-1 px-2 py-1 rounded bg-signal-500/10 text-signal-300 text-xs font-mono font-semibold border border-signal-500/30">
                             <i class="ph-fill ph-check-circle"></i> Aprovado
                         </span>
                     </td>
                     <td class="px-6 py-4 text-right align-top pt-5">
-                        <a href="${link}" target="_blank" class="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 bg-white border border-slate-300 rounded-md text-sm font-medium text-slate-700 hover:bg-slate-50 hover:text-brand-600 transition-colors group-hover:border-brand-300">
+                        <a href="${link}" target="_blank" class="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 bg-ink-900/60 border border-ink-600 rounded-md text-sm font-medium text-mist-200 hover:bg-ink-700/60 hover:text-copper-300 hover:border-copper-500/40 transition-colors">
                             Acessar <i class="ph-bold ph-arrow-up-right text-xs"></i>
                         </a>
                     </td>
@@ -274,39 +366,41 @@ https://prae.ufc.br/pt/</textarea>
         function exibirMensagemVazia(mensagem) {
             corpoTabela.innerHTML = `
                 <tr>
-                    <td colspan="4" class="px-6 py-12 text-center text-slate-500">
+                    <td colspan="4" class="px-6 py-14 text-center">
                         <div class="flex flex-col items-center justify-center">
-                            <i class="ph-duotone ph-coffee text-4xl text-slate-400 mb-3"></i>
-                            <p class="font-medium text-slate-700 text-lg">Nenhuma novidade encontrada.</p>
-                            <p class="text-sm mt-1 max-w-md">${mensagem}</p>
+                            <i class="ph-duotone ph-coffee text-4xl text-mist-400 mb-3"></i>
+                            <p class="font-medium text-mist-200 text-lg">Nenhuma novidade encontrada.</p>
+                            <p class="text-sm mt-1 max-w-md text-mist-400">${mensagem}</p>
                         </div>
                     </td>
                 </tr>
             `;
-            statusTabela.className = "px-2.5 py-1 bg-amber-100 text-amber-700 text-xs font-bold rounded-full";
+            statusTabela.className = "px-2.5 py-1 bg-ink-700 text-mist-300 text-[11px] font-mono font-semibold tracking-wide uppercase rounded-full border border-ink-600";
             statusTabela.innerText = "Sem Resultados";
+            definirLed('is-empty', 'SEM SINAL NESTA VARREDURA');
         }
 
         function exibirErroServidor() {
             corpoTabela.innerHTML = `
                 <tr>
-                    <td colspan="4" class="px-6 py-12 text-center">
-                        <div class="flex flex-col items-center justify-center p-4 bg-red-50 rounded-lg border border-red-100 max-w-lg mx-auto">
-                            <i class="ph-fill ph-warning-circle text-4xl text-red-500 mb-2"></i>
-                            <p class="font-bold text-red-700 text-lg">Falha de Comunicação com a API</p>
-                            <p class="text-sm text-red-600 mt-2 text-left w-full">
-                                <strong>Verifique se:</strong>
-                                <ul class="list-disc list-inside text-left mt-1">
-                                    <li>O servidor Python está rodando (<code>uvicorn main:app --reload</code>).</li>
-                                    <li>A porta <code>8000</code> está com visibilidade Pública no Codespaces.</li>
+                    <td colspan="4" class="px-6 py-14 text-center">
+                        <div class="flex flex-col items-center justify-center p-4 bg-rust-500/10 rounded-lg border border-rust-500/25 max-w-lg mx-auto">
+                            <i class="ph-fill ph-warning-circle text-4xl text-rust-400 mb-2"></i>
+                            <p class="font-bold text-rust-400 text-lg">Falha de Comunicação com a API</p>
+                            <p class="text-sm text-mist-300 mt-2 text-left w-full">
+                                <strong class="text-mist-200">Verifique se:</strong>
+                                <ul class="list-disc list-inside text-left mt-1 space-y-0.5">
+                                    <li>O servidor Python está rodando (<code class="font-mono text-rust-300">uvicorn main:app --reload</code>).</li>
+                                    <li>A porta <code class="font-mono text-rust-300">8000</code> está com visibilidade Pública no Codespaces.</li>
                                 </ul>
                             </p>
                         </div>
                     </td>
                 </tr>
             `;
-            statusTabela.className = "px-2.5 py-1 bg-red-100 text-red-700 text-xs font-bold rounded-full";
+            statusTabela.className = "px-2.5 py-1 bg-rust-500/15 text-rust-400 text-[11px] font-mono font-semibold tracking-wide uppercase rounded-full border border-rust-500/30";
             statusTabela.innerText = "Erro Crítico";
+            definirLed('is-error', 'ERRO DE COMUNICAÇÃO');
         }
     </script>
 </body>

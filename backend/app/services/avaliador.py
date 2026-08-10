@@ -52,35 +52,28 @@ sempre produzir o mesmo resultado. Não seja criativo. Não seja útil além do 
 
     return _processar_via_gemini(editais, prompt_sistema)
 
-
 def analisar_editais_periodico(editais: list, perfil_usuario: str) -> list:
     """
     Modo CURADOR — roda em background para compilação de relatórios/boletins diários.
-    Mais permissivo: aprova itens que beneficiem o perfil, mesmo que indiretamente.
+    Agora com a MESMA eficiência de captura do modo Ao Vivo, sem perda de dados.
     """
     if not editais:
         return []
 
-    prompt_sistema = f"""Você é um curador especialista de oportunidades e editais, montando o
-boletim diário para um usuário com o seguinte perfil: "{perfil_usuario}"
+    prompt_sistema = f"""Você é um filtro de correspondência exata encarregado de montar um boletim de oportunidades.
 
-CRITÉRIOS DE APROVAÇÃO:
-1. Aprove itens que tenham valor DIRETO para a carreira, estudos ou interesses descritos
-   no perfil (correspondência explícita ao tema, área ou instituição mencionada).
-2. Aprove também itens de valor INDIRETO, mas apenas quando a conexão for razoável e
-   defensável — não force relação onde não há. Ex: se o perfil menciona "engenharia elétrica",
-   um edital de "iniciação científica em automação" é indireto-válido; um edital de
-   "bolsa de artes cênicas" não é, mesmo que ambos sejam "oportunidades acadêmicas".
-3. REJEITE lixo corporativo, propaganda, notícias institucionais sem valor prático
-   (aniversário da instituição, evento social interno, etc.).
-4. Cada item aprovado deve receber uma justificativa curta e específica — não genérica —
-   explicando por que ele serve ao perfil descrito.
+CRITÉRIO EXATO DO USUÁRIO (não parafraseie): "{perfil_usuario}"
 
-Seja seletivo: prefira um boletim menor e relevante a um boletim grande e diluído.
+REGRAS INEGOCIÁVEIS (ALTA EFICIÊNCIA):
+1. Aprove TODOS os itens que correspondam de forma DIRETA e EXPLÍCITA ao critério acima. 
+2. Se o edital tratar de bolsas, auxílios, assistência ou vagas aplicáveis ao curso/local do usuário, APROVE. Não deduza que o usuário não vai querer; deixe que ele decida.
+3. REJEITE apenas lixo absoluto: cardápios, avisos de manutenção, atas de reunião, eventos passados ou chamadas de outras cidades/campi não relacionadas.
+4. Cada item aprovado deve receber uma justificativa curta (1 frase) na chave "justificativa", explicando por que atende ao critério.
+
+Sua tarefa é garantir que NENHUMA oportunidade válida fique de fora do boletim.
 """
 
     return _processar_via_gemini(editais, prompt_sistema)
-
 
 # ============================================================
 # NORMALIZAÇÃO E PARTICIONAMENTO
@@ -127,15 +120,29 @@ def _chamar_gemini_com_fallback(client: genai.Client, instrucao_base: str, texto
         response_mime_type="application/json"
     )
 
+    # É mais seguro concatenar o prompt em uma única string clara para a IA
+    prompt_completo = f"{instrucao_base}\n\n{PROMPT_ESTRUTURAL}\n\n{texto_lote}"
+
     for modelo in MODELOS_DISPONIVEIS:
         try:
             resposta = client.models.generate_content(
                 model=modelo,
-                contents=[instrucao_base, PROMPT_ESTRUTURAL, texto_lote],
+                contents=prompt_completo,
                 config=config_geracao
             )
 
-            resultados = json.loads(resposta.text)
+            # CORREÇÃO: Limpeza robusta contra blocos de Markdown ("""json)
+            texto_limpo = resposta.text.strip()
+            if texto_limpo.startswith('```json'):
+                texto_limpo = texto_limpo[7:]
+            elif texto_limpo.startswith('```'):
+                texto_limpo = texto_limpo[3:]
+            if texto_limpo.endswith('```'):
+                texto_limpo = texto_limpo[:-3]
+            
+            texto_limpo = texto_limpo.strip()
+
+            resultados = json.loads(texto_limpo)
 
             # Validação de shape: garante que é lista, não dict/None/string
             if not isinstance(resultados, list):

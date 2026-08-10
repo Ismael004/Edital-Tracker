@@ -1,42 +1,32 @@
-from services.coletor_dados import executar_coleta_e_triagem
-from services.avaliador import analisar_editais_ao_vivo, analisar_editais_periodico
+from services.coletor_dados import executar_coleta_multiplas_urls
+from services.avaliador import analisar_editais_ao_vivo
+
 
 def executar_motor_ao_vivo(user_id: str, sites: list[str], prompt_perfil: str) -> tuple[list, list]:
-    todos_brutos = []
-    todos_aprovados = []
-    
-    for site_url in sites:
-        print(f"\n[MOTOR] [{user_id}] Iniciando ciclo isolado para o host: {site_url}")
-        
-        # 1. Extrai os links APENAS deste site específico
-        brutos_do_site = executar_coleta_e_triagem(site_url)
-        
-        if brutos_do_site:
-            todos_brutos.extend(brutos_do_site)
-            print(f"[{user_id}] Acionando IA (AO VIVO) exclusivamente para os {len(brutos_do_site)} itens de {site_url}...")
-            
-            # 2. O Gemini avalia apenas este lote pequeno (Foco 100%, sem perda de dados)
-            aprovados_do_site = analisar_editais_ao_vivo(brutos_do_site, perfil_usuario=prompt_perfil) or []
-            todos_aprovados.extend(aprovados_do_site)
-            
-    return todos_brutos, todos_aprovados
+    """
+    Fluxo do botão "Testar agora" no dashboard. Modo rígido (analisar_editais_ao_vivo),
+    sem dedup — a pessoa está testando ajuste de prompt/sites e quer ver tudo, mesmo
+    itens já vistos antes. Se isso não for mais o comportamento desejado, adicionar
+    obter_urls_ja_processadas() aqui, no mesmo padrão usado em tasks/rotinas.py.
+    """
+    print(f"\n[MOTOR] [{user_id}] Iniciando varredura ao vivo em {len(sites)} site(s)...")
 
-def executar_motor_periodico(user_id: str, sites: list[str], prompt_perfil: str) -> tuple[list, list]:
-    todos_brutos = []
-    todos_aprovados = []
-    
-    for site_url in sites:
-        print(f"\n[MOTOR] [{user_id}] Iniciando ciclo isolado para o host: {site_url}")
-        
-        # 1. Extrai os links APENAS deste site específico
-        brutos_do_site = executar_coleta_e_triagem(site_url)
-        
-        if brutos_do_site:
-            todos_brutos.extend(brutos_do_site)
-            print(f"[{user_id}] Acionando IA (PERIÓDICO) exclusivamente para os {len(brutos_do_site)} itens de {site_url}...")
-            
-            # 2. O Gemini avalia apenas este lote pequeno (Foco 100%, sem perda de dados)
-            aprovados_do_site = analisar_editais_periodico(brutos_do_site, perfil_usuario=prompt_perfil) or []
-            todos_aprovados.extend(aprovados_do_site)
-            
-    return todos_brutos, todos_aprovados
+    # Coleta paralela entre sites, em vez de sequencial — mesmo ganho de velocidade
+    # já aplicado no fluxo periódico.
+    brutos = executar_coleta_multiplas_urls(sites)
+
+    if not brutos:
+        print(f"[MOTOR] [{user_id}] Nenhum item coletado.")
+        return [], []
+
+    print(f"[MOTOR] [{user_id}] {len(brutos)} item(ns) coletado(s). Acionando IA (modo ao vivo)...")
+    aprovados = analisar_editais_ao_vivo(brutos, perfil_usuario=prompt_perfil) or []
+
+    return brutos, aprovados
+
+
+# NOTA: executar_motor_periodico() foi removido deste arquivo — era código morto,
+# nunca chamado por nenhuma rota. O fluxo periódico real vive em tasks/rotinas.py
+# (rotina_diaria_de_buscas), que é o que o CRON de fato executa. Manter as duas
+# implementações em paralelo é o tipo de duplicação que causa bug de "eu corrigi
+# aqui mas o sistema continua usando a versão velha" — ponto único de verdade agora.

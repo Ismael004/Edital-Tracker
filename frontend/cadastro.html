@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Radar — Configurar Alerta</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        display: ['"Space Grotesk"', 'sans-serif'],
+                        mono: ['"IBM Plex Mono"', 'ui-monospace', 'monospace'],
+                    },
+                    colors: {
+                        ink: { 950: '#0A0F18', 900: '#0F1622', 850: '#121A28', 800: '#151E2E', 700: '#1B2537', 600: '#233047', 500: '#374763' },
+                        copper: { 300: '#F3CD8E', 400: '#E9BA70', 500: '#DDA24B', 600: '#C1852F' },
+                        signal: { 300: '#A6EEE1', 400: '#7FDCC9', 500: '#54C4AF', 600: '#3B9E8C' },
+                        rust: { 400: '#E68A6C', 500: '#D66A48' },
+                        mist: { 400: '#8993AC', 300: '#A3ACC2', 200: '#C7CEDE', 100: '#EDF0F6' },
+                    },
+                    boxShadow: {
+                        panel: '0 1px 0 0 rgba(255,255,255,0.03) inset, 0 12px 32px -16px rgba(0,0,0,0.5)',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        :root{ --grid-line: rgba(221,162,75,0.06); }
+        body{
+            background-color: #0A0F18;
+            background-image:
+                linear-gradient(var(--grid-line) 1px, transparent 1px),
+                linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+            background-size: 28px 28px;
+        }
+        .led{
+            width: 8px; height: 8px; border-radius: 999px;
+            background: #4b5a78; box-shadow: 0 0 0 3px rgba(75,90,120,0.15);
+            transition: background .3s ease, box-shadow .3s ease;
+        }
+        .led.is-idle{ background:#4b5a78; box-shadow:0 0 0 3px rgba(75,90,120,0.15); }
+        .led.is-busy{ background:#DDA24B; box-shadow:0 0 0 3px rgba(221,162,75,0.22); animation: blink 1s ease-in-out infinite; }
+        .led.is-ok{ background:#54C4AF; box-shadow:0 0 0 3px rgba(84,196,175,0.22); }
+        .led.is-error{ background:#D66A48; box-shadow:0 0 0 3px rgba(214,106,72,0.22); animation: blink .7s ease-in-out infinite; }
+        @keyframes blink{ 50%{ opacity:.35; } }
+
+        textarea:focus, input:focus{ outline: none; }
+        .field:focus-within{ border-color:#DDA24B; box-shadow:0 0 0 3px rgba(221,162,75,0.14); }
+        a:focus-visible, button:focus-visible{ outline: 2px solid #DDA24B; outline-offset: 2px; }
+
+        @media (prefers-reduced-motion: reduce){
+            .led.is-busy, .led.is-error, .animate-spin{ animation: none !important; }
+        }
+    </style>
+</head>
+<body class="text-mist-100 antialiased min-h-screen flex flex-col font-sans">
+
+    <!-- Cabeçalho: barra de instrumento -->
+    <header class="bg-ink-900/90 backdrop-blur border-b border-ink-600 h-16 flex items-center px-6 shrink-0">
+        <div class="flex items-center gap-3">
+            <i class="ph-fill ph-radar text-copper-400 text-2xl"></i>
+            <span class="font-display font-semibold text-lg tracking-tight text-mist-100">Radar</span>
+            <span class="hidden sm:inline text-mist-400 text-xs font-mono ml-1">/ configurar alerta</span>
+        </div>
+        <div class="ml-auto flex items-center gap-2 font-mono text-xs text-mist-300">
+            <span id="headerLed" class="led is-idle"></span>
+            <span id="headerLedLabel">AGUARDANDO CONFIGURAÇÃO</span>
+        </div>
+    </header>
+
+    <!-- Área Principal -->
+    <main class="flex-1 overflow-y-auto p-6 flex flex-col items-center justify-center">
+        <div class="w-full max-w-lg space-y-6">
+
+            <div class="text-center px-2">
+                <p class="font-mono text-[11px] text-copper-400 tracking-[0.18em] uppercase mb-2">Alerta automático diário</p>
+                <h1 class="text-2xl sm:text-3xl font-display font-semibold text-mist-100 leading-tight">A gente lê os editais.<br class="hidden sm:block"> Você só recebe o que importa.</h1>
+                <p class="text-sm text-mist-400 mt-3 max-w-md mx-auto">Preencha uma vez. O sistema varre os sites listados todo dia e te avisa por e-mail só quando encontrar algo relevante para o seu perfil.</p>
+            </div>
+
+            <!-- Painel do formulário -->
+            <div class="bg-ink-850 rounded-2xl border border-ink-600 shadow-panel overflow-hidden">
+                <div class="px-6 py-4 border-b border-ink-600 flex items-center gap-2">
+                    <i class="ph-bold ph-sliders-horizontal text-copper-400"></i>
+                    <h2 class="text-sm font-mono font-semibold text-mist-200 tracking-[0.1em] uppercase">Parâmetros do Radar</h2>
+                </div>
+
+                <form id="formCadastro" class="p-6 space-y-5" onsubmit="event.preventDefault();">
+
+                    <div class="field rounded-lg border border-ink-600 bg-ink-900/60 transition-all">
+                        <div class="flex items-center gap-1.5 px-3 pt-3">
+                            <label for="email" class="flex items-center gap-1.5 text-xs font-mono font-semibold text-mist-300 tracking-wide uppercase">
+                                <i class="ph ph-at text-copper-400"></i> Seu e-mail
+                            </label>
+                        </div>
+                        <input
+                            type="email" id="email" name="email" required
+                            placeholder="voce@exemplo.com"
+                            class="w-full px-3 py-2.5 bg-transparent text-sm text-mist-100 font-mono placeholder:text-mist-400"
+                        >
+                    </div>
+
+                    <div class="field rounded-lg border border-ink-600 bg-ink-900/60 transition-all">
+                        <div class="flex items-center justify-between px-3 pt-3">
+                            <label for="listaSites" class="flex items-center gap-1.5 text-xs font-mono font-semibold text-mist-300 tracking-wide uppercase">
+                                <i class="ph ph-globe text-copper-400"></i> Sites Monitorados
+                            </label>
+                            <span class="text-[10px] font-mono text-copper-400 bg-copper-500/10 border border-copper-500/25 rounded px-1.5 py-0.5">um por linha</span>
+                        </div>
+                        <textarea
+                            id="listaSites" rows="4" required
+                            class="w-full px-3 py-2.5 bg-transparent text-sm text-mist-100 font-mono resize-none leading-relaxed placeholder:text-mist-400"
+                            placeholder="https://sobral.ufc.br/&#10;https://prae.ufc.br/pt/"
+                        ></textarea>
+                    </div>
+
+                    <div class="field rounded-lg border border-ink-600 bg-ink-900/60 transition-all">
+                        <div class="flex items-center justify-between px-3 pt-3">
+                            <label for="promptPerfil" class="flex items-center gap-1.5 text-xs font-mono font-semibold text-mist-300 tracking-wide uppercase">
+                                <i class="ph ph-brain text-copper-400"></i> O que você busca
+                            </label>
+                            <span class="text-[10px] font-mono text-signal-400 bg-signal-500/10 border border-signal-500/25 rounded px-1.5 py-0.5">Gemini</span>
+                        </div>
+                        <textarea
+                            id="promptPerfil" rows="4" required
+                            class="w-full px-3 py-2.5 bg-transparent text-sm text-mist-100 resize-none font-mono leading-relaxed placeholder:text-mist-400"
+                            placeholder="Ex: estudante de Engenharia Elétrica na UFC Sobral, interesse em bolsas de monitoria e editais de assistência estudantil"
+                        ></textarea>
+                    </div>
+
+                    <button
+                        type="submit" id="btnAtivar"
+                        class="w-full bg-copper-500 hover:bg-copper-600 text-ink-950 px-5 py-3 rounded-lg text-sm font-mono font-semibold tracking-wide uppercase shadow-sm transition-all flex items-center justify-center gap-2"
+                    >
+                        <i class="ph-bold ph-power" id="iconeBtnAtivar"></i>
+                        <span id="textoBtnAtivar">Ativar Meu Alerta</span>
+                    </button>
+
+                    <div id="mensagemStatus" class="text-xs font-mono text-center hidden"></div>
+                </form>
+            </div>
+
+            <p class="text-center text-[11px] font-mono text-mist-400 tracking-wide">
+                fase de testes · poucas vagas · sem spam · reenviar atualiza sua configuração
+            </p>
+        </div>
+    </main>
+
+    <script>
+        // Ajuste para o endereço real do seu backend (Oracle Cloud) antes de publicar.
+        const API_BASE_URL = "https://cuddly-halibut-qwxgx4pq75rfj96-8000.app.github.dev";
+
+        const form = document.getElementById('formCadastro');
+        const btnAtivar = document.getElementById('btnAtivar');
+        const iconeBtnAtivar = document.getElementById('iconeBtnAtivar');
+        const textoBtnAtivar = document.getElementById('textoBtnAtivar');
+        const mensagemStatus = document.getElementById('mensagemStatus');
+        const headerLed = document.getElementById('headerLed');
+        const headerLedLabel = document.getElementById('headerLedLabel');
+
+        function definirLed(estado, texto){
+            headerLed.className = 'led ' + estado;
+            headerLedLabel.innerText = texto;
+        }
+
+        function definirMensagem(texto, tipo){
+            mensagemStatus.classList.remove('hidden', 'text-signal-300', 'text-rust-400');
+            mensagemStatus.classList.add(tipo === 'ok' ? 'text-signal-300' : 'text-rust-400');
+            mensagemStatus.innerText = texto;
+        }
+
+        form.addEventListener('submit', async (evento) => {
+            evento.preventDefault();
+
+            const email = document.getElementById('email').value.trim().toLowerCase();
+            const sitesTexto = document.getElementById('listaSites').value.trim();
+            const perfil = document.getElementById('promptPerfil').value.trim();
+
+            const targetSites = sitesTexto
+                .split('\n')
+                .map(linha => linha.trim())
+                .filter(linha => linha !== '');
+
+            // Sem login: o e-mail normalizado serve como identificador estável do usuário.
+            // Reenviar o formulário com o mesmo e-mail atualiza a configuração (upsert no backend).
+            const payload = {
+                user_id: email,
+                email: email,
+                target_sites: targetSites,
+                prompt_perfil: perfil
+            };
+
+            btnAtivar.disabled = true;
+            btnAtivar.classList.add('opacity-75', 'cursor-not-allowed');
+            textoBtnAtivar.innerText = "Salvando...";
+            iconeBtnAtivar.className = "ph-bold ph-spinner animate-spin";
+            definirLed('is-busy', 'ENVIANDO CONFIGURAÇÃO');
+            mensagemStatus.classList.add('hidden');
+
+            try {
+                const resposta = await fetch(`${API_BASE_URL}/api/editais/configurar`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const dados = await resposta.json();
+
+                if (resposta.ok) {
+                    definirMensagem(dados.mensagem || 'Configuração salva com sucesso.', 'ok');
+                    definirLed('is-ok', 'ALERTA ATIVO');
+                } else {
+                    definirMensagem(dados.detail || 'Não deu para salvar agora. Tenta de novo.', 'erro');
+                    definirLed('is-error', 'FALHA AO SALVAR');
+                }
+            } catch (erro) {
+                console.error('Falha ao comunicar com o servidor:', erro);
+                definirMensagem('Falha de conexão com o servidor. Tenta de novo em instantes.', 'erro');
+                definirLed('is-error', 'ERRO DE COMUNICAÇÃO');
+            } finally {
+                btnAtivar.disabled = false;
+                btnAtivar.classList.remove('opacity-75', 'cursor-not-allowed');
+                textoBtnAtivar.innerText = "Ativar Meu Alerta";
+                iconeBtnAtivar.className = "ph-bold ph-power";
+            }
+        });
+    </script>
+</body>
+</html>
