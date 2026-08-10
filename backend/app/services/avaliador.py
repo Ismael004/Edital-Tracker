@@ -54,25 +54,31 @@ sempre produzir o mesmo resultado. Não seja criativo. Não seja útil além do 
 
 def analisar_editais_periodico(editais: list, perfil_usuario: str) -> list:
     """
-    Modo CURADOR — roda em background para compilação de relatórios/boletins diários.
-    Agora com a MESMA eficiência de captura do modo Ao Vivo, sem perda de dados.
-    """
+        Modo RÍGIDO — disparado manualmente pelo usuário no dashboard.
+        Validação estrita em tempo real: zero inferência, zero tolerância a ambiguidade.
+        """
     if not editais:
         return []
-
-    prompt_sistema = f"""Você é um filtro de correspondência exata encarregado de montar um boletim de oportunidades.
-
-CRITÉRIO EXATO DO USUÁRIO (não parafraseie): "{perfil_usuario}"
-
-REGRAS INEGOCIÁVEIS (ALTA EFICIÊNCIA):
-1. Aprove TODOS os itens que correspondam de forma DIRETA e EXPLÍCITA ao critério acima. 
-2. Se o edital tratar de bolsas, auxílios, assistência ou vagas aplicáveis ao curso/local do usuário, APROVE. Não deduza que o usuário não vai querer; deixe que ele decida.
-3. REJEITE apenas lixo absoluto: cardápios, avisos de manutenção, atas de reunião, eventos passados ou chamadas de outras cidades/campi não relacionadas.
-4. Cada item aprovado deve receber uma justificativa curta (1 frase) na chave "justificativa", explicando por que atende ao critério.
-
-Sua tarefa é garantir que NENHUMA oportunidade válida fique de fora do boletim.
-"""
-
+    
+    prompt_sistema = f"""Você é um FILTRO LITERAL de correspondência exata, operando em tempo real para um teste manual do usuário.
+    
+CRITÉRIO EXATO DO USUÁRIO (não parafraseie, não reinterprete): "{perfil_usuario}"
+    
+REGRAS INEGOCIÁVEIS:
+1. Aprove SOMENTE itens que correspondam de forma DIRETA e EXPLÍCITA ao critério acima.
+2. É PROIBIDO fazer inferência, generalização, associação temática ou dedução lógica.
+    Exemplo: se o critério menciona "Unicamp", REJEITE itens sobre Fuvest, Enem, USP,
+    vestibulares em geral ou qualquer instituição diferente — mesmo que pareçam relacionados.
+3. Na dúvida entre aprovar e rejeitar, REJEITE. Falso negativo é aceitável; falso positivo não é.
+4. Não amplie o escopo do critério com sinônimos, categorias mais amplas ou contexto que
+    o usuário não escreveu explicitamente.
+5. Ignore completamente relevância "de carreira" ou "de estudos" genérica — o único critério
+    válido é a correspondência literal ao texto fornecido pelo usuário.
+    
+Sua tarefa é agir como um filtro determinístico: dado o mesmo input, o mesmo critério deve
+sempre produzir o mesmo resultado. Não seja criativo. Não seja útil além do que foi pedido.
+    """
+    
     return _processar_via_gemini(editais, prompt_sistema)
 
 # ============================================================
