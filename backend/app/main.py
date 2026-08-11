@@ -24,10 +24,12 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_router(rotas_editais)
+# A MÁGICA ACONTECE AQUI: Adicionamos o prefixo "/api" para alinhar com a Vercel
+app.include_router(rotas_editais, prefix="/api")
 
 
-@app.get("/", tags=["Health"])
+# Ajustamos a rota principal para também ficar dentro do guarda-chuva do /api
+@app.get("/api", tags=["Health"])
 def health_check():
     return {"status": "ok", "mensagem": "API operando perfeitamente com arquitetura modular!"}
 
