@@ -274,7 +274,7 @@ https://prae.ufc.br/pt/</textarea>
             // --- C. Comunicação Real com o FastAPI ---
             try {
                 // ROTA ATUALIZADA de acordo com api/rotas.py
-                const resposta = await fetch(`${API_BASE_URL}/api/editais/varredura-ao-vivo`, {
+                const resposta = await fetch(`/api/api/editais/configurar`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
