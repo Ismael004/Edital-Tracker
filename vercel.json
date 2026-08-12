@@ -15,8 +15,12 @@
       "destination": "/backend/app/main.py"
     },
     {
-      "source": "/(.*)",
+      "source": "/",
       "destination": "/frontend/cadastro.html"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/frontend/$1"
     }
   ]
 }
