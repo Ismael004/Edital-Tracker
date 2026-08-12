@@ -3,7 +3,7 @@ from models.schemas import ConfiguracaoUsuario, RespostaDaBusca
 from services.controlador_principal import executar_motor_ao_vivo
 from database.db import atualizar_configuracao_bd
 
-router = APIRouter(prefix="/api/editais", tags=["Motor de Busca"])
+router = APIRouter(prefix="/editais", tags=["Motor de Busca"])
 
 
 @router.post("/configurar")
