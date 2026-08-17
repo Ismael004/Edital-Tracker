@@ -3,6 +3,7 @@ import os
 import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+#começaremos o próximo ataque
 
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
