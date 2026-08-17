@@ -1,0 +1,1533 @@
+<!DOCTYPE html>
+<html lang="pt">
+
+<head>
+    
+    <meta charset=utf-8 />
+    <meta http-equiv=X-UA-Compatible content="IE=edge" />
+    <meta name=viewport content="width=device-width, initial-scale=1.0" />
+    <meta name=description content="Notícias Prefeitura de Graça" />
+    <meta name=keywords content="Prefeitura, Municipal, Executivo, Graça, CE, Prefeitura de Gra?a " />
+    <title>Prefeitura de Graça    </title>
+    <meta property="og:locale" content="pt_BR">
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="">
+    <meta property="og:description" content="">
+    <meta property="og:url" content="https://www.graca.ce.gov.br/informa.php?id=0">
+    <meta property="og:site_name" content="www.graca.ce.gov.br">
+
+            <meta property="og:image" content="https://www.graca.ce.gov.br/imagens/logo.png">
+        <!-- <meta property="og:updated_time" content="1440432930" /> -->
+
+    <!-- core CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet">
+    <link href="/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/css/font-awesome.min.css" rel="stylesheet">
+    <link href="/css/prettyPhoto.css" rel="stylesheet">
+    <link href="/css/animate.min.css" rel="stylesheet">
+    <link href="/css/main.css" rel="stylesheet">
+    <link href="/css/responsive.css" rel="stylesheet">
+    <link href="/css/style.php" rel="stylesheet">
+    <link href="/css/iconestelas.css" rel="stylesheet">
+    <!--[if lt IE 9]>
+        <script src="js/html5shiv.js"></script>
+        <script src="js/respond.min.js"></script>
+        <![endif]-->
+    <link rel='shortcut icon' href='/imagens/icomuni.png'>    <link rel="apple-touch-icon-precomposed" sizes="144x144" href="/images/ico/apple-touch-icon-144-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" sizes="114x114" href="/images/ico/apple-touch-icon-114-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" sizes="72x72" href="/images/ico/apple-touch-icon-72-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" href="/images/ico/apple-touch-icon-57-precomposed.png">
+</head>
+<!--/head-->
+
+<body href="#" id="ancora">
+
+
+    
+<link href="/css/satisfacao/style.css?v=2.0" rel="stylesheet">
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css?family=Dancing+Script" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css?family=Roboto+Slab" rel="stylesheet">
+<script>
+var tam = 15;
+
+function mudaFonte(tipo, elemento) {
+    if (tipo == "mais") {
+        if (tam < 24)
+            tam += 1;
+    } else {
+        if (tam > 10)
+            tam -= 1;
+    }
+    document.getElementById("Noticia").style.fontSize = tam + "px";
+    document.getElementById("Descricao").style.fontSize = tam + "px";
+}
+
+function printDiv(id, pg, url) {
+    var oPrint, oJan;
+    oPrint = window.document.getElementById(id).innerHTML;
+    oJan = window.open(pg);
+    oJan.document.write(oPrint);
+    oJan.document.write(url);
+    oJan.window.print();
+    oJan.document.close();
+    oJan.focus();
+}
+
+
+
+// Função contraste INICIO
+(function() {
+    var Contrast = {
+        storage: 'contrastState',
+        cssClass: 'contrast',
+        currentState: null,
+        check: checkContrast,
+        getState: getContrastState,
+        setState: setContrastState,
+        toogle: toogleContrast,
+        updateView: updateViewContrast
+    };
+
+    window.toggleContrast = function() {
+        Contrast.toogle();
+    };
+
+    Contrast.check();
+
+    function checkContrast() {
+        this.updateView();
+    }
+
+    function getContrastState() {
+        return localStorage.getItem(this.storage) === 'true';
+    }
+
+    function setContrastState(state) {
+        localStorage.setItem(this.storage, '' + state);
+        this.currentState = state;
+        this.updateView();
+    }
+
+    function updateViewContrast() {
+        var body = document.body;
+
+        if (this.currentState === null)
+            this.currentState = this.getState();
+
+        if (this.currentState)
+            body.classList.add(this.cssClass);
+        else
+            body.classList.remove(this.cssClass);
+    }
+
+    function toogleContrast() {
+        this.setState(!this.currentState);
+    }
+})();
+// Função contraste FIM
+</script>
+
+
+
+<!-- CSS style offcanvas navbar --> 
+<style>
+
+.offcanvas-collapse {
+position: fixed;
+bottom: 0;
+right: 100%;
+left:-300px;
+width: 300px;
+overflow: auto;
+visibility: hidden;
+background-color: #01924D;
+transition-timing-function: ease-in-out;
+transition-duration: .3s;
+transition-property: left, visibility;
+z-index: 1045;
+}
+.offcanvas-collapse {
+    align-items:start;
+/*   Adds a subtle drop shadow   */
+            -moz-background-clip: padding;     /* Firefox 3.6 */
+        -webkit-background-clip: padding;  /* Safari 4? Chrome 6? */
+        background-clip: padding-box;      /* Firefox 4, Safari 5, Opera 10, IE 9 */
+border-right:5px solid rgba(0, 0, 0, 0.2);
+height: auto;
+min-height: 100%;
+}
+
+/* Makes the nav visibile with the open class */
+.offcanvas-collapse.open {
+    left: 0;
+    visibility: visible;
+}
+
+
+.navbar-expand-lg .navbar-nav {
+-ms-flex-direction: column;
+flex-direction: column;
+}
+
+.offcanvas-collapse>.navbar-nav>li>a:hover {
+    color: #fff !important;
+    background-color: #000;
+    opacity: 0.5;
+}
+
+.offcanvas-collapse>.navbar-nav > li {
+    margin-left: 1px;
+}
+
+.offcanvas-collapse>.navbar-nav>.dropdown.open{
+    color: #249546 !important;
+    background-color: #fff !important;
+    /* opacity: 0.5 !important; */
+}
+
+.offcanvas-collapse>.navbar-nav>.dropdown.open>a{
+    color: #fff !important;
+    /* background-color: #000 !important; */
+    opacity: 0.5 !important;
+}
+
+.offcanvas-collapse.navbar-collapse {
+    padding-right: 0px !important; 
+    padding-left: 0px !important;
+}
+
+
+.dropdown-submenu { position:relative;} .dropdown-submenu>.dropdown-menu {top:0; left:100%; margin-top:-6px;}
+
+
+/* Botão de fechar */
+.offcanvas-close {
+  position: fixed;
+  top: 15px;
+  left: 300px; /* Ajuste de posição */
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 30px;
+  cursor: pointer;
+  z-index: 1050; /* Sobrepõe o menu */
+}
+.open>.dropdown-menu-offcanvas {
+    display: contents !important;
+}
+
+ /* Estilo da backdrop */
+ .offcanvas-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 1040;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease;
+}
+.offcanvas-backdrop.show {
+  opacity: 1;
+  visibility: visible;
+}
+
+.dropdown-menu-acessibilidade li a {
+ color: #249546 !important ;
+}
+
+.dropdown-toggle-acessibilidade:hover .dropdown-menu-acessibilidade { 
+ display: block !important;
+}
+/* 
+    navbar-dafault-main entra em conflito com .navbar-default quando o MenuDegrade está ativo
+    Esse conflito deixa o menu branco
+*/
+
+.navbar-dafault-main {
+    background-image: url(""), 
+                      url("");
+    background-repeat: no-repeat, no-repeat ;
+    background-position: left, right ;
+}
+.social-links-top {
+    /* border-left: 1px solid #fff; */
+}
+
+</style>
+
+
+
+
+<!-- INÍCIO DO TOPO DO SITE -->
+<header id="header" class=" navbar navbar-fixed-top wet-asphalt" style="border:0px; background-image:url(/imagens/top/Background63.jpg);">
+        <div class="container-fluid topo-option-1 color-topo">
+        <div class="container">
+            <div class="row" id="font-setting-buttons" style="position: relative; z-index: 5; line-height: 33px; display: flex; justify-content: flex-end; gap: .3em; align-items: center;">
+
+                        
+                        <div class="title__cliente" style="margin-bottom: 0px; padding-left:0; padding-right:0; margin-right: auto; color: #fff;">
+                            <a href="https://www.graca.ce.gov.br"><span>Prefeitura Municipal de Graça</span></a>
+                        </div>
+
+                        
+                            <div style="margin-bottom: 0px; padding-left:0; padding-right:0;width: 130px; "><a
+                            href="/ouvidoria"><i class="bi bi-headset"></i> <span class='nomefora'
+                                title="Ouvidoria da entidade">Ouvidoria/Sic</span></a></div>
+
+                    
+                
+
+                <div style="margin-bottom: 0px; padding-left:0; padding-right:0;width: 130px;"><a
+                        href="/acessoainformacao.php"><i class="bi bi-info-circle-fill"></i> <span class='nomefora'
+                            title="Transparência da entidade">Transparência</span></a></div>
+
+                <!--<div class="col-sm-12 col-xs-12"><a href="campanha.php?pg=COVID-19" style="display: block;color: #fff;line-height: 35px;"> <img width="17" alt='Covid' height="17" src="imagens/covid.png"> <strong>CORONAVÍRUS (COVID-19): </strong><span class='nomefora'>Boletins, Ações, Transparência e material educativo - </span> clique aqui </a></div>-->
+                    <div style="margin-bottom: 0px; float:right; padding-left:0; padding-right:0; width: 130px" class="dropdown dropdown-toggle-acessibilidade"><a href="#"
+                            accesskey="1" title="Página de acessibilidade" class="dropdown-toggle" data-toggle="dropdown" ><i class="bi bi-emoji-smile"></i> <span
+                                class='nomefora'>Acessibilidade</span></a>
+                            
+                                <ul class="dropdown-menu dropdown-menu-right dropdown-menu-acessibilidade" style="min-width: 150px; color:#000;">
+                                    <li><a href="/acessibilidade.php" style="cursor:pointer;"
+                                        title="Página de acessibilidade"><i class="bi bi-emoji-smile"></i> <span
+                                        class='nomefora'>Sobre</span></a></li>
+
+                                    <li><a href="#altocontraste"
+                                        id="altocontraste" onclick="window.toggleContrast()" style="cursor:pointer;" accesskey="2"
+                                        title="Aplicar Contraste"><i class="bi bi-toggles"></i> <span
+                                        class='nomefora'>Contraste</span></a></li>
+
+                                    <li> <a
+                                        class="nav-link increase-me btn-list-top" style="cursor:pointer; " accesskey="A"
+                                        title="Aumentar texto"><i class="bi bi-plus-square"></i> <span
+                                        class='nomefora'>Aumentar</span></a></li>
+                                    <li><a
+                                        class="nav-link decrease-me btn-list-top" style="cursor:pointer; " accesskey="D"
+                                        title="Diminuir texto"> <i class="bi bi-dash-square"></i> <span
+                                        class='nomefora'>Diminuir</span></a></li>
+                                    
+                                    <li><a style="cursor:pointer;"
+                                        href="https://www.gov.br/governodigital/pt-br/vlibras" target='_blank' accesskey="M"
+                                        title="VLibras"><i class='fa fa-hand-paper-o'></i> <span class='nomefora'>Libras</span></a></li>
+
+                                    <li><a href="/mapadosite" style="cursor: pointer;"
+                                        title="Mapa do site" accesskey="M"><i class="bi bi-diagram-3-fill"></i> <span
+                                        class="nomefora">Mapa do site</span></a></li>
+                                </ul>
+                            
+                    </div>
+
+                    <div style="margin-bottom: 0px; padding-left:0; padding-right:0;width: 100px;"><a
+                        href="/pesquisa"><i class="bi bi-search"></i> <span class='nomefora'
+                            title="Transparência da entidade">Pesquisar</span></a></div>
+
+                <!-- fim de acessibilidade -->
+
+                <!-- redes sociais -->
+                <div class="social-links-top">
+                                                    <a class="nav-link btn-list-top" href="https://www.facebook.com/prefeituramunicipaldegracace">
+                                    <i class='bi bi-facebook' title="Facebook"></i>
+                                </a>
+                                                    <a class="nav-link btn-list-top" href="https://www.instagram.com/prefeituradograca/">
+                                    <i class='bi bi-instagram' title="Instagram"></i>
+                                </a>
+                                                    <a class="nav-link btn-list-top" href="https://webmail-seguro.com.br/graca.ce.gov.br/">
+                                    <i class='bi bi-envelope-fill' title="E-mail"></i>
+                                </a>
+                    
+                        
+                </div>
+                <!-- redes sociais -->
+
+            </div>
+        </div>
+    </div>
+
+
+    <div class="container-fluid topo-option-mobile color-topo">
+        <div class="container">
+            <div class="row" id="font-setting-buttons" style="line-height: 33px; display: flex; position: relative; z-index: 5;">
+                
+                    <div style="margin-bottom: 0px; padding-left: 7px; padding-right: 10px;"><a
+                        href="/acessoainformacao.php"><i class='bi bi-info-circle-fill'></i> <span
+                        title="Transparência da entidade"><strong>Transparência</strong></span></a></div>
+
+                    <div style="margin-bottom: 0px; padding-left:0; padding-right: 10px;"><a
+                        href="ouvidoria"><i class="bi bi-headset"></i> <span
+                        title="Ouvidoria da entidade"><strong>Ouvidoria </strong></span></a></div>
+
+                    <div style="margin-bottom: 0px; padding-left:0; padding-right: 10px;"><a
+                        href="/acessibilidade"><i class='bi bi-emoji-smile'></i> <span
+                        title="Acessibilidade"><strong>Acessibilidade</strong></span></a></div>
+
+                    <div style="margin-bottom: 0px; padding-left:0; padding-right:10;" class="dropdown dropdown-toggle-acessibilidade">
+                        <a href="#" accesskey="1" title="Mais opções" class="dropdown-toggle" data-toggle="dropdown">
+                            <i class="bi bi-plus"></i>
+                            <span><strong>Opções</strong></span>
+                        </a>
+
+                        <ul class="dropdown-menu dropdown-menu-right dropdown-menu-acessibilidade" style="min-width: 150px; color:#000;">
+                            <li>
+                                <a href="/pesquisa" style="cursor:pointer;" title="Pesquisar"><i class="bi bi-search"></i><span style="padding-left: 10px;">Pesquisar</span></a>
+                            </li>
+                    </div>
+            </div>
+        </div>
+    </div>
+    
+        <div class="col-md-12 col-fita" style="padding-bottom: 10px;">
+        <div class="row fitaflex">
+            <div class="col-md-2 fita"
+                style="margin-bottom:0px; border-top: 9px solid; border-image: linear-gradient(45deg, #018747, #D2600B ) 1;">
+            </div>
+            <div class="col-md-2 fita"
+                style="margin-bottom:0px; border-top: 9px solid; border-image: linear-gradient(45deg, #D2600B, #F48C40 ) 1;">
+            </div>
+            <div class="col-md-2 fita"
+                style="margin-bottom:0px; border-top: 9px solid; border-image: linear-gradient(45deg, #F48C40, #018747 ) 1;">
+            </div>
+            <div class="col-md-2 fita"
+                style="margin-bottom:0px; border-top: 9px solid; border-image: linear-gradient(45deg, #018747, #D2600B ) 1;">
+            </div>
+            <div class="col-md-2 fita"
+                style="margin-bottom:0px; border-top: 9px solid; border-image: linear-gradient(45deg, #D2600B, #F48C40 ) 1;">
+            </div>
+            <div class="col-md-2 fita"
+                style="margin-bottom:0px; border-top: 9px solid #F48C40;"></div>
+        </div>
+    </div>
+
+    
+    <div class="container container-menu-main" id="logo-top-bar" style="padding-bottom:10px; padding-top:10px; ">
+
+
+
+        <div class="row d-flex-main-menu-center">
+           
+            <div id="centralizarLogo" class="col-6 col-sm-7 col-xs-7 ">
+
+                <a id="" href="/" style="padding-right: 5px; margin-right: 20px"><img id="" src="/imagens/logo.png?time=1786917958" alt="logo"></a>
+            </div>
+
+            <div class="col-6 col-canvas-navbar">
+                <a class="navbar-toggle" data-toggle="offcanvas"
+                        style="padding-top: 4px; padding-bottom: 4px; padding-left: 14px; padding-right: 14px; cursor: pointer; color:#fff; "
+                        data-target=".offcanvas-collapse">
+                        <span class="fa fa-bars" style="font-size: 25px; color: #000;"></span>
+                </a>
+            </div>
+
+            <div class="col-sm-5 col-xs-5 fora_responsivo">
+                <div class="wow fadeInUp box-pesq">
+                    
+
+                    <a href='/selos' class='break-responsive-header' style='margin-left: 5px'><img style='width: 60px' src='/imagens/imagensselos/unicef-2021-2024-p.png' alt='Selo UNICEF 2021-2024' title='Selo UNICEF 2021-2024'></a><a href='/selos' class='break-responsive-header' style='margin-left: 5px'><img style='width: 60px' src='/imagens/imagensselos/alfa-ouro-p.png' alt='Selo Nacional compromisso com a Alfabetização Ouro 2024
+' title='Selo Nacional compromisso com a Alfabetização Ouro 2024
+'></a>
+                    
+
+                    <!-- <a href="/pesquisa.php" class="btn btn-primary nomefora"><span class="glyphicon glyphicon-search "
+                            aria-hidden="true"></span> Pesquisa</a> -->
+
+                        <!--
+                        <div class="nomefora" id="google_translate_element"></div>
+                        <script>
+                            function googleTranslateElementInit() {
+                                new google.translate.TranslateElement({
+                                        pageLanguage: 'pt',
+                                        autoDisplay: false,
+                                        includedLanguages: 'de,es,fr,en,it',
+                                        layout: google.translate.TranslateElement.InlineLayout.SIMPLE
+                                    },
+                                    'google_translate_element');
+                            }
+                        </script>
+                        <script src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+                        -->
+
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+
+    <!-- navbar offcanvas -->
+    <nav class="navbar navbar-default navbar-dafault-main" style="border:0px;">
+        <div class="container">
+            <div class="navbar-header navbar-header-main">
+                <a class="navbar-toggle" data-toggle="offcanvas"
+                    style="padding-top: 4px; padding-bottom: 4px; padding-left: 14px; padding-right: 14px; cursor: pointer; color:#fff; "
+                    data-target=".offcanvas-collapse">
+                    <span class="fa fa-bars" style="font-size: 16px"></span>
+                </a>
+                <a href="pesquisa.php" class="navbar-toggle"
+                    style="padding-top: 4px; padding-bottom: 4px; padding-left: 14px; padding-right: 14px; display: none;"><span
+                        class="fa fa-search" style="font-size: 16px" aria-hidden="true"></span></a>
+                <a class="navbar-toggle" id="btnperq" href="#" aria-expanded='false' title='Menu de acessibilidade'
+                    style="padding-top: 4px; padding-bottom: 4px; padding-left: 14px; padding-right: 14px;  cursor: pointer; display: none;"><i
+                        class='fa fa-odnoklassniki' style="font-size: 16px" aria-hidden='true'></i></a>
+                            </div>
+                            
+            
+            <div class="collapse navbar-collapse navbar-collapse-toglee" style="border:0px;">
+                <ul class="nav navbar-nav main-menu" style="margin-top:0px;">
+                    
+                    <li><a href="/" title="Inicio" target=""><i class="fa fa-home fa-lg" aria-hidden="true"></i></a></li>  <li class='dropdown'><a href='/' class='dropdown-toggle' data-toggle='dropdown'>O MUNICÍPIO 
+                                                <i class='fa fa-angle-down'></i></a>
+                                                    <ul class='dropdown-menu ' style='overflow: auto; max-height:300px; min-width:120px;'><li><a href='/conselhos.php' >CONSELHOS</a></li><li><a href='/omunicipio.php' >DADOS DO MUNICIPIO</a></li><li><a href='/guiadomunicipio.php' >GUIA DO MUNICIPIO</a></li><li><a href='/simbolos.php' >SÍMBOLOS</a></li><li><a href='/veiculos.php' >VEÍCULOS</a></li><li><a href='/obras.php' >OBRAS MUNICIPAIS</a></li><li><a href='/agenda.php' >AGENDA MUNICIPAL</a></li><li><a href='/pontosturisticos.PHP' target='MESMA PAGI'>PONTOS TURISTICOS</a></li>		</ul>
+                                            </li>  <li class='dropdown'><a href='/' class='dropdown-toggle' data-toggle='dropdown'>A PREFEITURA 
+                                                <i class='fa fa-angle-down'></i></a>
+                                                    <ul class='dropdown-menu ' style='overflow: auto; max-height:300px; min-width:100px;'><li><a href='/institucional.php' >INSTITUCIONAL</a></li><li><a href='/gestores.php' >PREFEITO E VICE</a></li><li><a href='/galeriagestores.php' >GALERIA DE GESTORES</a></li><li><a href='/normativosproprios.php?A PREFEITURA=' >NORMATIVOS PRÓPRIOS</a></li>		</ul>
+                                            </li>  <li class='dropdown'><a href='/secretaria.php' class='dropdown-toggle' data-toggle='dropdown'>SECRETARIAS <i class='fa fa-angle-down'></i></a>
+                                    <ul class='dropdown-menu ' style='overflow: auto; max-height:300px; min-width:480px;'><li><a href='/secretaria.php?sec=25'>CONTROLADORIA GERAL DO MUNICÍPIO</a></li><li><a href='/secretaria.php?sec=2'>GABINETE DA PREFEITURA</a></li><li><a href='/secretaria.php?sec=24'>OUVIDORIA GERAL DO MUNICIPIO</a></li><li><a href='/secretaria.php?sec=22'>PROCURADORIA GERAL DO MUNICIPIO</a></li><li><a href='/secretaria.php?sec=1'>SECRETARIA DE ADMINISTRAÇÃO E FINANÇAS</a></li><li><a href='/secretaria.php?sec=3'>SECRETARIA DE AGRICULTURA E RECURSOS HÍDRICOS</a></li><li><a href='/secretaria.php?sec=8'>SECRETARIA DE CULTURA, TURISMO, ESPORTE E LAZER</a></li><li><a href='/secretaria.php?sec=13'>SECRETARIA DE MEIO AMBIENTE</a></li><li><a href='/secretaria.php?sec=5'>SECRETARIA DE OBRAS, TRANSPORTES E SERVIÇOS PÚBLICOS</a></li><li><a href='/secretaria.php?sec=11'>SECRETARIA DO TRABALHO E ASSISTENCIA SOCIAL</a></li><li><a href='/secretaria.php?sec=4'>SECRETARIA MUNICIPAL DE EDUCAÇÃO</a></li><li><a href='/secretaria.php?sec=6'>SECRETARIA MUNICIPAL DE SAÚDE</a></li>		</ul>
+</li>  <li class='dropdown'><a href='/informa.php' class='dropdown-toggle' data-toggle='dropdown'>AÇÕES 
+                                                <i class='fa fa-angle-down'></i></a>
+                                                    <ul class='dropdown-menu ' style='overflow: auto; max-height:300px; min-width:120px;'><li><a href='/informa.php?cat=2' >NOTÍCIAS</a></li><li><a href='/informa.php?cat=3' >OBRAS</a></li><li><a href='/videos.php' >VIDEOS</a></li>		</ul>
+                                            </li><li><a href='/servicos.php' >SERVIÇOS</a></li>  <li class='dropdown'><a href='/lrf.php' class='dropdown-toggle' data-toggle='dropdown'>LRF E CONTAS PÚBLICAS <i class='fa fa-angle-down'></i></a>
+                                <ul class='dropdown-menu ' style='overflow: auto; max-height:300px; '><li><a href='/lrf.php?cat=4'>RGF - RELATÓRIO DE GESTÃO FISCAL</a></li><li><a href='/lrf.php?cat=5'>PCPE - PROCEDIMENTOS CONTÁBEIS PATRIMONIAIS E ESPECÍFICOS</a></li><li><a href='/lrf.php?cat=7'>RREO - RELATÓRIO RESUMIDO DA EXECUÇÃO ORÇAMENTÁRIA</a></li><li><a href='/lrf.php?cat=8'>LOA - LEI ORÇAMENTÁRIA ANUAL</a></li><li><a href='/lrf.php?cat=9'>LDO - LEI DE DIRETRIZES ORÇAMENTÁRIAS</a></li><li><a href='/lrf.php?cat=16'>PPA - PLANO PLURIANUAL</a></li><li><a href='/contasdegoverno.php'>PCG - PRESTAÇÃO DE CONTAS DE GOVERNO</a></li><li><a href='/contasdegestao.php'>PCS - PRESTAÇÃO DE CONTAS DE GESTÃO</a></li>		</ul>
+</li>  <li class='dropdown'><a href='/publicacoes.php' class='dropdown-toggle' data-toggle='dropdown'>PUBLICAÇÕES 
+                                                <i class='fa fa-angle-down'></i></a>
+                                                    <ul class='dropdown-menu ' style='overflow: auto; max-height:300px; '><li><a href='/lei14133.php?dtini=&dtfim=&obj=&sit=&cat_dispensa=3&tipo=' >INTENÇÃO DE COTAÇÃO</a></li><li><a href='/processoseletivo.php' >PROCESSO SELETIVO</a></li><li><a href='/contratos.php' >CONTRATOS</a></li><li><a href='/decretos.php' >DECRETOS</a></li><li><a href='/diarias.php' >DIÁRIAS</a></li><li><a href='/leis.php' >LEIS</a></li><li><a href='/licitacao.php' >LICITAÇÃO</a></li><li><a href='/contasdegoverno' >PCG</a></li><li><a href='/contasdegestao' >PCS</a></li><li><a href='/portaria.php' >PORTARIAS</a></li>		</ul>
+                                            </li>                </ul>
+            </div>
+        </div>
+        <!--/.container-->
+        
+        <div class="navbar-collapse offcanvas-collapse">
+            <ul class="navbar-nav mr-auto dropdown-menu dropdown-menu-offcanvas">
+
+            <button class="offcanvas-close" aria-label="Close">&times;</button>
+                
+            <li><a href="/" title="Inicio" target="">INÍCIO</a></li>  <li class='dropdown'><a href='/' class='dropdown-toggle' data-toggle='dropdown'>O MUNICÍPIO 
+                                                <i class='fa fa-angle-down'></i></a>
+                                                    <ul class='dropdown-menu ' style='overflow: auto; max-height:300px; min-width:120px;'><li><a href='/conselhos.php' >CONSELHOS</a></li><li><a href='/omunicipio.php' >DADOS DO MUNICIPIO</a></li><li><a href='/guiadomunicipio.php' >GUIA DO MUNICIPIO</a></li><li><a href='/simbolos.php' >SÍMBOLOS</a></li><li><a href='/veiculos.php' >VEÍCULOS</a></li><li><a href='/obras.php' >OBRAS MUNICIPAIS</a></li><li><a href='/agenda.php' >AGENDA MUNICIPAL</a></li><li><a href='/pontosturisticos.PHP' target='MESMA PAGI'>PONTOS TURISTICOS</a></li>		</ul>
+                                            </li>  <li class='dropdown'><a href='/' class='dropdown-toggle' data-toggle='dropdown'>A PREFEITURA 
+                                                <i class='fa fa-angle-down'></i></a>
+                                                    <ul class='dropdown-menu ' style='overflow: auto; max-height:300px; min-width:100px;'><li><a href='/institucional.php' >INSTITUCIONAL</a></li><li><a href='/gestores.php' >PREFEITO E VICE</a></li><li><a href='/galeriagestores.php' >GALERIA DE GESTORES</a></li><li><a href='/normativosproprios.php?A PREFEITURA=' >NORMATIVOS PRÓPRIOS</a></li>		</ul>
+                                            </li>  <li class='dropdown'><a href='/secretaria.php' class='dropdown-toggle' data-toggle='dropdown'>SECRETARIAS <i class='fa fa-angle-down'></i></a>
+                                    <ul class='dropdown-menu ' style='overflow: auto; max-height:300px; min-width:480px;'><li><a href='/secretaria.php?sec=25'>CONTROLADORIA GERAL DO MUNICÍPIO</a></li><li><a href='/secretaria.php?sec=2'>GABINETE DA PREFEITURA</a></li><li><a href='/secretaria.php?sec=24'>OUVIDORIA GERAL DO MUNICIPIO</a></li><li><a href='/secretaria.php?sec=22'>PROCURADORIA GERAL DO MUNICIPIO</a></li><li><a href='/secretaria.php?sec=1'>SECRETARIA DE ADMINISTRAÇÃO E FINANÇAS</a></li><li><a href='/secretaria.php?sec=3'>SECRETARIA DE AGRICULTURA E RECURSOS HÍDRICOS</a></li><li><a href='/secretaria.php?sec=8'>SECRETARIA DE CULTURA, TURISMO, ESPORTE E LAZER</a></li><li><a href='/secretaria.php?sec=13'>SECRETARIA DE MEIO AMBIENTE</a></li><li><a href='/secretaria.php?sec=5'>SECRETARIA DE OBRAS, TRANSPORTES E SERVIÇOS PÚBLICOS</a></li><li><a href='/secretaria.php?sec=11'>SECRETARIA DO TRABALHO E ASSISTENCIA SOCIAL</a></li><li><a href='/secretaria.php?sec=4'>SECRETARIA MUNICIPAL DE EDUCAÇÃO</a></li><li><a href='/secretaria.php?sec=6'>SECRETARIA MUNICIPAL DE SAÚDE</a></li>		</ul>
+</li>  <li class='dropdown'><a href='/informa.php' class='dropdown-toggle' data-toggle='dropdown'>AÇÕES 
+                                                <i class='fa fa-angle-down'></i></a>
+                                                    <ul class='dropdown-menu ' style='overflow: auto; max-height:300px; min-width:120px;'><li><a href='/informa.php?cat=2' >NOTÍCIAS</a></li><li><a href='/informa.php?cat=3' >OBRAS</a></li><li><a href='/videos.php' >VIDEOS</a></li>		</ul>
+                                            </li><li><a href='/servicos.php' >SERVIÇOS</a></li>  <li class='dropdown'><a href='/lrf.php' class='dropdown-toggle' data-toggle='dropdown'>LRF E CONTAS PÚBLICAS <i class='fa fa-angle-down'></i></a>
+                                <ul class='dropdown-menu ' style='overflow: auto; max-height:300px; '><li><a href='/lrf.php?cat=4'>RGF - RELATÓRIO DE GESTÃO FISCAL</a></li><li><a href='/lrf.php?cat=5'>PCPE - PROCEDIMENTOS CONTÁBEIS PATRIMONIAIS E ESPECÍFICOS</a></li><li><a href='/lrf.php?cat=7'>RREO - RELATÓRIO RESUMIDO DA EXECUÇÃO ORÇAMENTÁRIA</a></li><li><a href='/lrf.php?cat=8'>LOA - LEI ORÇAMENTÁRIA ANUAL</a></li><li><a href='/lrf.php?cat=9'>LDO - LEI DE DIRETRIZES ORÇAMENTÁRIAS</a></li><li><a href='/lrf.php?cat=16'>PPA - PLANO PLURIANUAL</a></li><li><a href='/contasdegoverno.php'>PCG - PRESTAÇÃO DE CONTAS DE GOVERNO</a></li><li><a href='/contasdegestao.php'>PCS - PRESTAÇÃO DE CONTAS DE GESTÃO</a></li>		</ul>
+</li>  <li class='dropdown'><a href='/publicacoes.php' class='dropdown-toggle' data-toggle='dropdown'>PUBLICAÇÕES 
+                                                <i class='fa fa-angle-down'></i></a>
+                                                    <ul class='dropdown-menu ' style='overflow: auto; max-height:300px; '><li><a href='/lei14133.php?dtini=&dtfim=&obj=&sit=&cat_dispensa=3&tipo=' >INTENÇÃO DE COTAÇÃO</a></li><li><a href='/processoseletivo.php' >PROCESSO SELETIVO</a></li><li><a href='/contratos.php' >CONTRATOS</a></li><li><a href='/decretos.php' >DECRETOS</a></li><li><a href='/diarias.php' >DIÁRIAS</a></li><li><a href='/leis.php' >LEIS</a></li><li><a href='/licitacao.php' >LICITAÇÃO</a></li><li><a href='/contasdegoverno' >PCG</a></li><li><a href='/contasdegestao' >PCS</a></li><li><a href='/portaria.php' >PORTARIAS</a></li>		</ul>
+                                            </li>            
+            </ul>
+      </div>
+      
+    </nav>
+    <div class="offcanvas-backdrop"></div>
+    <!--/nav-->
+
+
+</header>
+    
+<style type="text/css">
+    </style>
+
+
+<div id="espaco-header" class="espaco-header-main" style="height:207px; margin-bottom: 27.4px;">&nbsp;</div>
+
+
+
+<!-- <div id="sticky-container-id" class="sticky-container">
+    <ul class="sticky"> -->
+
+        
+    <!-- </ul>
+</div> -->
+
+
+  
+<!-- VLibras -->
+<div vw class="enabled">
+    <div vw-access-button class="active"></div>
+    <div vw-plugin-wrapper>
+      <div class="vw-plugin-top-wrapper"></div>
+    </div>
+  </div>
+  <script src="https://vlibras.gov.br/app/vlibras-plugin.js" defer></script>
+  <script defer>
+    document.addEventListener('DOMContentLoaded', function() {
+      new window.VLibras.Widget('https://vlibras.gov.br/app');
+    });
+</script>
+<!-- VLibras -->
+
+<script src="/js/jquery-2.1.1.min.js"></script>
+<script type="text/javascript">
+$(document).ready(function() {
+
+    $('.offcanvas-backdrop').removeClass('show');
+
+    $('[data-toggle="offcanvas"]').on('click', function () {
+        $('.offcanvas-collapse').removeClass('open');
+        const target = $(this).data('target');
+        $(target).toggleClass('open');
+        $('.offcanvas-backdrop').addClass('show');
+    })
+
+    // Fechar o menu ao clicar no backdrop
+    $('.offcanvas-backdrop, .offcanvas-close').on('click', function () {
+      $('.offcanvas-collapse').removeClass('open');
+      $('.offcanvas-backdrop').removeClass('show');
+    })
+
+    $('.dropdown-menu-sub').hide();
+    $('.dropdown-submenu a.dropdown-sub-toggle').on("click", function(e){
+        $(this).next('ul').toggle();
+        e.stopPropagation();
+        e.preventDefault();
+    });
+
+
+    $(window).scroll(function() {
+        if ($(this).scrollTop() > 100) {
+            $("#logo-top-bar").css({
+                "margin-top": "-25.5Vh",
+                "transition": ".4s",
+                "z-index": "-2"
+            });
+            $("#logo-top-bar").fadeOut("800");
+            $('#scroll').fadeIn();
+            $('#scroll2').fadeIn();
+            $('#scroll3').fadeIn();
+             
+            $(".col-fita").fadeOut();
+
+        } else {
+            $("#logo-top-bar").fadeIn("800");
+            $("#logo-top-bar").css({
+                "margin-top": "0px"
+            });
+            $(".col-fita").fadeIn();
+            $('#scroll').fadeOut();
+            $('#scroll2').fadeOut();
+            $('#scroll3').fadeOut();
+        }
+    });
+    $('#scroll').click(function() {
+        $("html, body").animate({
+            scrollTop: 0
+        }, 0);
+        return false;
+    });
+
+
+    $('#menu-acessiblidade').hide().contents().hide();
+    $('#btnperq').on('click', function(e) {
+        e.preventDefault();
+        $('#menu-acessiblidade').slideToggle('fast', function(e) {
+            if ($(this).is(':visible')) {
+                $(this).contents().fadeIn(1000);
+            } else {
+                $(this).contents().hide();
+            }
+        });
+
+    })
+
+
+});
+</script>
+
+
+             <section id="services" class="topo-paginas-section">
+    <div class="container">
+        <div class="col-md-12" style="padding-left:0px;">
+
+            <!--<div id="TituloServicos">-->
+            <div class="cartaservicosbanner" style="font-size: 16px;">Notícias</div>
+            <h2 id="EsOv" class="cartaservicosbannertexto" style="font-size: 16px; padding-left: 5px;">Notícias do município.</h2>
+            <!--</div>-->
+
+        </div>
+    </div>
+</section>
+
+
+            
+            <section style="margin-top:10px; margin-bottom:10px;">
+                <div class="container">
+                    <div class="public_paginas" style="margin-top: -50px;">
+                            <div class='col-md-12'>
+        <div class="row">
+                        <ol class="breadcrumb" style="background-color:#FFFFFF; margin-bottom: 0px;">
+                <li class="breadcrumb-item"><a href="/index.php">Início</a></li>
+                <li class="breadcrumb-item active">Notícias</li>            </ol>
+                    </div>
+    </div>
+                        <div class="titulo">
+                            <strong>Opções de filtro</strong>
+                            <span style="font-size: 12px;"> <i>Para usar as opções de filtro, escolha o campo para a pesquisa e clique no botão pesquisar</i> </span>
+                        </div>
+                        <div class="col-md-12">
+                            <form>
+                                <div class="row">
+                                    
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label class="label-form"><i class="fa fa-calendar"></i> Período </label>
+                                                <div class="form-group">
+                                                    <div class="col-md-6" style="padding-left: 0;">
+                                                        <input type="text" name="dtini" id="dtini" class="form-control" value="" />
+                                                    </div>
+                                                    <div class="col-md-6" style="padding-right: 0;">
+                                                        <input type="text" name="dtfim" id="dtfim" class="form-control" value="" />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label class="label-form"><i class="fa fa-pencil"></i> Descrição</label>
+                                            <input type="text" name="descr" class="form-control" value="" />
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label class="label-form"><i class="fa fa-filter"></i> Categoria</label>
+                                            <select name="cate" class="form-control">
+                                                <option value="">Selecione uma categoria</option>
+                                                <option  value='1' data-filter=''>#Administração      </option><option  value='2' data-filter=''>#Agenda             </option><option  value='3' data-filter=''>#Agricultura        </option><option  value='4' data-filter=''>#AssistênciaSocial  </option><option  value='5' data-filter=''>#Audiência          </option><option  value='6' data-filter=''>#Controladoria      </option><option  value='7' data-filter=''>#Controle           </option><option  value='8' data-filter=''>#Cultura            </option><option  value='9' data-filter=''>#DefesaCivil        </option><option  value='10' data-filter=''>#Desenvolvimento    </option><option  value='11' data-filter=''>#DireitosHumano     </option><option  value='12' data-filter=''>#Drogas             </option><option  value='13' data-filter=''>#Educação           </option><option  value='14' data-filter=''>#Empreendedorismo   </option><option  value='15' data-filter=''>#Emprego            </option><option  value='16' data-filter=''>#Esporte            </option><option  value='17' data-filter=''>#Festa              </option><option  value='18' data-filter=''>#Finança            </option><option  value='19' data-filter=''>#FolhaDePagamento   </option><option  value='20' data-filter=''>#Gestão             </option><option  value='21' data-filter=''>#Habitação          </option><option  value='22' data-filter=''>#Imposto            </option><option  value='23' data-filter=''>#Infraestrutura     </option><option  value='24' data-filter=''>#Jurídico           </option><option  value='25' data-filter=''>#Juventude          </option><option  value='26' data-filter=''>#Lazer              </option><option  value='27' data-filter=''>#Limpeza            </option><option  value='28' data-filter=''>#MeioAmbiente       </option><option  value='29' data-filter=''>#Melhoria           </option><option  value='30' data-filter=''>#Mobilidade         </option><option  value='31' data-filter=''>#Mulher             </option><option  value='32' data-filter=''>#Município          </option><option  value='33' data-filter=''>#Obra               </option><option  value='34' data-filter=''>#Planejamento       </option><option  value='35' data-filter=''>#Prefeito           </option><option  value='36' data-filter=''>#Saúde              </option><option  value='37' data-filter=''>#Segurança          </option><option  value='38' data-filter=''>#Tecnologia         </option><option  value='39' data-filter=''>#Transparência      </option><option  value='40' data-filter=''>#Tributo            </option><option  value='41' data-filter=''>#Turismo            </option><option  value='42' data-filter=''>#Urbanismo          </option>                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label class="label-form"><i class="fa fa-filter"></i> Secretaria</label>
+                                            <select name="secr" class="form-control">
+                                                <option value="">Selecione uma secretaria</option>
+                                                <option  value='25' data-filter=''>CONTROLADORIA GERAL DO MUNICÍPIO</option><option  value='27' data-filter=''>FUNDO DE MANUTENÇÃO E DESENVOLVIMENTO DA EDUCAÇÃO BÁSICA</option><option  value='26' data-filter=''>FUNDO MUNICIPAL DA CRIANÇA E DO ADOLESCENTE</option><option  value='28' data-filter=''>FUNDO MUNICIPAL DE ASSISTÊNCIA SOCIAL</option><option  value='29' data-filter=''>FUNDO MUNICIPAL DE EDUCAÇÃO</option><option  value='30' data-filter=''>FUNDO MUNICIPAL DE SAUDE</option><option  value='2' data-filter=''>GABINETE DA PREFEITURA</option><option  value='24' data-filter=''>OUVIDORIA GERAL DO MUNICIPIO</option><option  value='22' data-filter=''>PROCURADORIA GERAL DO MUNICIPIO</option><option  value='1' data-filter=''>SECRETARIA DE ADMINISTRAÇÃO E FINANÇAS</option><option  value='3' data-filter=''>SECRETARIA DE AGRICULTURA E RECURSOS HÍDRICOS</option><option  value='8' data-filter=''>SECRETARIA DE CULTURA, TURISMO, ESPORTE E LAZER</option><option  value='13' data-filter=''>SECRETARIA DE MEIO AMBIENTE</option><option  value='5' data-filter=''>SECRETARIA DE OBRAS, TRANSPORTES E SERVIÇOS PÚBLICOS</option><option  value='11' data-filter=''>SECRETARIA DO TRABALHO E ASSISTENCIA SOCIAL</option><option  value='4' data-filter=''>SECRETARIA MUNICIPAL DE EDUCAÇÃO</option><option  value='6' data-filter=''>SECRETARIA MUNICIPAL DE SAÚDE</option>                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+
+                                                                          
+                                <div class="row group-btn-export">
+                                    <div class="col-md-7" style="padding-right: 0px;">
+                                        <button type="submit" class="btn btn-primary"><i class='fa fa-search'></i> Pesquisar</button> 
+                                        <a href="/informa" class="btn btn-primary"><i class="fa fa-times-circle-o"></i> Limpar </a>
+
+                                        <input type="checkbox" name="fakenews" class="form-check-input" value="F"  />
+                                        <label class="form-check-label"><strong>FAKE NEWS</strong></label>
+                                                                            </div>
+
+                                    <div class="col-md-5 group-btn-export-item">
+                                        <div class="btn-group">
+                                            <a class="btn btn-primary" target="_blank" href="/relatorio.php?id=57&rel=IEFORCAoRGF0YUluZiA+PSA6ZGF0YWluaWNpbyBPUiBEYXRhSW5mIElTIE5VTEwpIA==&val=XzpkYXRhaW5pY2lvPTIwMjEtMDEtMDEgMDA6MDA6MDA="><i class="fa fa-bars"></i> Opções para exportação </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            <section id="blog" class="blog">
+                <div class="container">
+                    <div class="public_paginas">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="titulo" style="padding-bottom:0;">
+                                    <strong>Lista de notícias</strong>
+                                    <span style='font-size: 12px'><i>Foram encontradas 50 registros</i> <span>                                </div>
+
+                                
+<div class="col-md-4">
+                                    <div class="" style="margin-top: 10px; padding-bottom: 0; border-radius: 9px;">
+
+                                    <div style="border-radius: 10px;">
+                                    	<a href='/informa/789/dia-dos-pais-uma-data-para-celebrar-o-amor-o-cuida'>		<img class='img-responsive' style='width:100%; height: 250px; margin-right:5px; background-color:;background-repeat:no-repeat; background-size: cover; object-fit: cover; background-position:center; margin-bottom: 0px; border-radius: 9px' src=/fotos/789/Capa789.png> </img>	</a>                                    </div>
+
+                                    <div class="col-md-12" style="padding: 1.1em 0;">
+
+                                        <span class="tag_news"> #graça </span>
+
+                                        <h4 class="data_h4" style="padding-block: 7px;">
+                                            <a class="LinkInforma3" href="/informa/789/dia-dos-pais-uma-data-para-celebrar-o-amor-o-cuida">
+                                                <strong>Dia dos Pais: uma data para celebrar o amor, o cuidado e o exemplo</strong>                                            </a>
+                                        </h4>
+
+                                                                                    <p style="font-size: 16px; margin-bottom: 7px; line-height: 1.6;">
+                                                O Dia dos Pais é um momento especial para homenagear aqueles que, com amor, dedicação e exemplo, deixam marcas positivas na vida de suas famílias e inspiram as futuras gerações.                                            </p>
+                                        
+                                                                                    <span style="margin-left: 3px"> Há 17 dias </span>
+                                         
+                                        
+                                        <div style="clear:both; padding-top: 0px; ">
+                                            <a href="/informa/789/dia-dos-pais-uma-data-para-celebrar-o-amor-o-cuida" style="font-size: 14px" class="type-link1"> Continue lendo... </a>
+                                        </div>
+
+                                    </div>
+
+                                    </div>
+                                </div> 
+
+                                
+                                   
+<div class="col-md-4">
+                                    <div class="" style="margin-top: 10px; padding-bottom: 0; border-radius: 9px;">
+
+                                    <div style="border-radius: 10px;">
+                                    	<a href='/informa/788/prefeitura-de-gra-a-inicia-arrecada-o-da-cip-para-'>		<img class='img-responsive' style='width:100%; height: 250px; margin-right:5px; background-color:;background-repeat:no-repeat; background-size: cover; object-fit: cover; background-position:center; margin-bottom: 0px; border-radius: 9px' src=/fotos/788/Img0_600x400.jpg> </img>	</a>                                    </div>
+
+                                    <div class="col-md-12" style="padding: 1.1em 0;">
+
+                                        <span class="tag_news"> #Obra                </span>
+
+                                        <h4 class="data_h4" style="padding-block: 7px;">
+                                            <a class="LinkInforma3" href="/informa/788/prefeitura-de-gra-a-inicia-arrecada-o-da-cip-para-">
+                                                <strong>Prefeitura de Graça inicia arrecadação da CIP para fortalecer a iluminação pública e garantir  [...] </strong>                                            </a>
+                                        </h4>
+
+                                                                                    <p style="font-size: 16px; margin-bottom: 7px; line-height: 1.6;">
+                                                                                            </p>
+                                        
+                                                                                    <span style="margin-left: 3px"> Há 154 dias </span>
+                                         
+                                        
+                                        <div style="clear:both; padding-top: 0px; ">
+                                            <a href="/informa/788/prefeitura-de-gra-a-inicia-arrecada-o-da-cip-para-" style="font-size: 14px" class="type-link1"> Continue lendo... </a>
+                                        </div>
+
+                                    </div>
+
+                                    </div>
+                                </div> 
+
+                                
+                                   
+<div class="col-md-4">
+                                    <div class="" style="margin-top: 10px; padding-bottom: 0; border-radius: 9px;">
+
+                                    <div style="border-radius: 10px;">
+                                    	<a href='/informa/787/participe-do-futuro-da-nossa-cidade-ajude-a-constr'>		<img class='img-responsive' style='width:100%; height: 250px; margin-right:5px; background-color:;background-repeat:no-repeat; background-size: cover; object-fit: cover; background-position:center; margin-bottom: 0px; border-radius: 9px' src=/fotos/787/Capa787.jpg> </img>	</a>                                    </div>
+
+                                    <div class="col-md-12" style="padding: 1.1em 0;">
+
+                                        <span class="tag_news"> #Planejamento        </span>
+
+                                        <h4 class="data_h4" style="padding-block: 7px;">
+                                            <a class="LinkInforma3" href="/informa/787/participe-do-futuro-da-nossa-cidade-ajude-a-constr">
+                                                <strong>Participe do futuro da nossa cidade! Ajude a construir o PPA Municipal</strong>                                            </a>
+                                        </h4>
+
+                                                                                    <p style="font-size: 16px; margin-bottom: 7px; line-height: 1.6;">
+                                                Você sabe o que é o PPA Municipal?                                            </p>
+                                        
+                                                                                    <span style="margin-left: 3px"> Há 362 dias </span>
+                                         
+                                        
+                                        <div style="clear:both; padding-top: 0px; ">
+                                            <a href="/informa/787/participe-do-futuro-da-nossa-cidade-ajude-a-constr" style="font-size: 14px" class="type-link1"> Continue lendo... </a>
+                                        </div>
+
+                                    </div>
+
+                                    </div>
+                                </div> 
+
+                                <div class='col-md-12' style='margin-bottom: 1em'></div>
+                                   
+<div class="col-md-4">
+                                    <div class="" style="margin-top: 10px; padding-bottom: 0; border-radius: 9px;">
+
+                                    <div style="border-radius: 10px;">
+                                    	<a href='/informa/786/a-prefeitura-municipal-de-gra-a-convida-toda-a-pop'>		<img class='img-responsive' style='width:100%; height: 250px; margin-right:5px; background-color:;background-repeat:no-repeat; background-size: cover; object-fit: cover; background-position:center; margin-bottom: 0px; border-radius: 9px' src=/fotos/786/Img0_600x400.jpg> </img>	</a>                                    </div>
+
+                                    <div class="col-md-12" style="padding: 1.1em 0;">
+
+                                        <span class="tag_news"> #Obra                </span>
+
+                                        <h4 class="data_h4" style="padding-block: 7px;">
+                                            <a class="LinkInforma3" href="/informa/786/a-prefeitura-municipal-de-gra-a-convida-toda-a-pop">
+                                                <strong>A Prefeitura Municipal de Graça, convida toda a população grancese para participar da 2ª Confer� [...] </strong>                                            </a>
+                                        </h4>
+
+                                                                                    <p style="font-size: 16px; margin-bottom: 7px; line-height: 1.6;">
+                                                A Prefeitura Municipal de Graça, convida toda a população grancese para participar da 2ª Conferência Municipal das Cidades. 
+Nesta sexta-feira, 27 de Junho.                                            </p>
+                                        
+                                                                                    <span style="margin-left: 3px"> Há 1 ano(s) </span>
+                                         
+                                        
+                                        <div style="clear:both; padding-top: 0px; ">
+                                            <a href="/informa/786/a-prefeitura-municipal-de-gra-a-convida-toda-a-pop" style="font-size: 14px" class="type-link1"> Continue lendo... </a>
+                                        </div>
+
+                                    </div>
+
+                                    </div>
+                                </div> 
+
+                                
+                                   
+<div class="col-md-4">
+                                    <div class="" style="margin-top: 10px; padding-bottom: 0; border-radius: 9px;">
+
+                                    <div style="border-radius: 10px;">
+                                    	<a href='/informa/785/radar-da-transpar-ncia-p-blica'>		<img class='img-responsive' style='width:100%; height: 250px; margin-right:5px; background-color:;background-repeat:no-repeat; background-size: cover; object-fit: cover; background-position:center; margin-bottom: 0px; border-radius: 9px' src=/fotos/785/Capa785.png> </img>	</a>                                    </div>
+
+                                    <div class="col-md-12" style="padding: 1.1em 0;">
+
+                                        <span class="tag_news"> #graça </span>
+
+                                        <h4 class="data_h4" style="padding-block: 7px;">
+                                            <a class="LinkInforma3" href="/informa/785/radar-da-transpar-ncia-p-blica">
+                                                <strong>Radar da Transparência Pública</strong>                                            </a>
+                                        </h4>
+
+                                                                                    <p style="font-size: 16px; margin-bottom: 7px; line-height: 1.6;">
+                                                Visando contribuir para a transparência na administração pública a Associação dos Membros dos Tribunais de Contas do Brasil                                            </p>
+                                        
+                                                                                    <span style="margin-left: 3px"> Há 3 ano(s) </span>
+                                         
+                                        
+                                        <div style="clear:both; padding-top: 0px; ">
+                                            <a href="/informa/785/radar-da-transpar-ncia-p-blica" style="font-size: 14px" class="type-link1"> Continue lendo... </a>
+                                        </div>
+
+                                    </div>
+
+                                    </div>
+                                </div> 
+
+                                
+                                   
+<div class="col-md-4">
+                                    <div class="" style="margin-top: 10px; padding-bottom: 0; border-radius: 9px;">
+
+                                    <div style="border-radius: 10px;">
+                                    	<a href='/informa/778/informamos-que-as-identidades-solicitadas-j-est-o-'>		<img class='img-responsive' style='width:100%; height: 250px; margin-right:5px; background-color:;background-repeat:no-repeat; background-size: cover; object-fit: cover; background-position:center; margin-bottom: 0px; border-radius: 9px' src=/fotos/778/Img0_600x400.jpg> </img>	</a>                                    </div>
+
+                                    <div class="col-md-12" style="padding: 1.1em 0;">
+
+                                        <span class="tag_news"> #AssistênciaSocial   </span>
+
+                                        <h4 class="data_h4" style="padding-block: 7px;">
+                                            <a class="LinkInforma3" href="/informa/778/informamos-que-as-identidades-solicitadas-j-est-o-">
+                                                <strong>Informamos que as identidades solicitadas já estão prontas, confira se seu nome está na lista.</strong>                                            </a>
+                                        </h4>
+
+                                                                                    <p style="font-size: 16px; margin-bottom: 7px; line-height: 1.6;">
+                                                                                            </p>
+                                        
+                                                                                    <span style="margin-left: 3px"> Há 3 ano(s) </span>
+                                         
+                                        
+                                        <div style="clear:both; padding-top: 0px; ">
+                                            <a href="/informa/778/informamos-que-as-identidades-solicitadas-j-est-o-" style="font-size: 14px" class="type-link1"> Continue lendo... </a>
+                                        </div>
+
+                                    </div>
+
+                                    </div>
+                                </div> 
+
+                                <div class='col-md-12' style='margin-bottom: 1em'></div>
+                                   
+<div class="col-md-4">
+                                    <div class="" style="margin-top: 10px; padding-bottom: 0; border-radius: 9px;">
+
+                                    <div style="border-radius: 10px;">
+                                    	<a href='/informa/765/no-munic-pio-de-gra-a-mais-de-600-estudantes-da-re'>		<img class='img-responsive' style='width:100%; height: 250px; margin-right:5px; background-color:;background-repeat:no-repeat; background-size: cover; object-fit: cover; background-position:center; margin-bottom: 0px; border-radius: 9px' src=/fotos/765/Img0_600x400.jpg> </img>	</a>                                    </div>
+
+                                    <div class="col-md-12" style="padding: 1.1em 0;">
+
+                                        <span class="tag_news"> #Educação            </span>
+
+                                        <h4 class="data_h4" style="padding-block: 7px;">
+                                            <a class="LinkInforma3" href="/informa/765/no-munic-pio-de-gra-a-mais-de-600-estudantes-da-re">
+                                                <strong>No Município de Graça, mais de 600 estudantes da Rede Municipal de Ensino estão participando do S [...] </strong>                                            </a>
+                                        </h4>
+
+                                                                                    <p style="font-size: 16px; margin-bottom: 7px; line-height: 1.6;">
+                                                                                            </p>
+                                        
+                                                                                    <span style="margin-left: 3px"> Há 3 ano(s) </span>
+                                         
+                                        
+                                        <div style="clear:both; padding-top: 0px; ">
+                                            <a href="/informa/765/no-munic-pio-de-gra-a-mais-de-600-estudantes-da-re" style="font-size: 14px" class="type-link1"> Continue lendo... </a>
+                                        </div>
+
+                                    </div>
+
+                                    </div>
+                                </div> 
+
+                                
+                                   
+<div class="col-md-4">
+                                    <div class="" style="margin-top: 10px; padding-bottom: 0; border-radius: 9px;">
+
+                                    <div style="border-radius: 10px;">
+                                    	<a href='/informa/768/prefeitura-municipal-de-graca-recebe-a-equipe-do-d'>		<img class='img-responsive' style='width:100%; height: 250px; margin-right:5px; background-color:;background-repeat:no-repeat; background-size: cover; object-fit: cover; background-position:center; margin-bottom: 0px; border-radius: 9px' src=/fotos/768/Img0_600x400.jpg> </img>	</a>                                    </div>
+
+                                    <div class="col-md-12" style="padding: 1.1em 0;">
+
+                                        <span class="tag_news"> #AssistênciaSocial   </span>
+
+                                        <h4 class="data_h4" style="padding-block: 7px;">
+                                            <a class="LinkInforma3" href="/informa/768/prefeitura-municipal-de-graca-recebe-a-equipe-do-d">
+                                                <strong>Prefeitura municipal de Graca recebe a equipe do Detran-CE para a realização de antendimentos da C [...] </strong>                                            </a>
+                                        </h4>
+
+                                                                                    <p style="font-size: 16px; margin-bottom: 7px; line-height: 1.6;">
+                                                                                            </p>
+                                        
+                                                                                    <span style="margin-left: 3px"> Há 3 ano(s) </span>
+                                         
+                                        
+                                        <div style="clear:both; padding-top: 0px; ">
+                                            <a href="/informa/768/prefeitura-municipal-de-graca-recebe-a-equipe-do-d" style="font-size: 14px" class="type-link1"> Continue lendo... </a>
+                                        </div>
+
+                                    </div>
+
+                                    </div>
+                                </div> 
+
+                                
+                                   
+<div class="col-md-4">
+                                    <div class="" style="margin-top: 10px; padding-bottom: 0; border-radius: 9px;">
+
+                                    <div style="border-radius: 10px;">
+                                    	<a href='/informa/767/nesta-segunda-feira-21-a-secret-ria-de-sa-de-parti'>		<img class='img-responsive' style='width:100%; height: 250px; margin-right:5px; background-color:;background-repeat:no-repeat; background-size: cover; object-fit: cover; background-position:center; margin-bottom: 0px; border-radius: 9px' src=/fotos/767/Img0_600x400.jpg> </img>	</a>                                    </div>
+
+                                    <div class="col-md-12" style="padding: 1.1em 0;">
+
+                                        <span class="tag_news"> #Saúde               </span>
+
+                                        <h4 class="data_h4" style="padding-block: 7px;">
+                                            <a class="LinkInforma3" href="/informa/767/nesta-segunda-feira-21-a-secret-ria-de-sa-de-parti">
+                                                <strong>Nesta segunda-feira (21), a Secretária de Saúde participou mais uma edição da Oficina Presencial [...] </strong>                                            </a>
+                                        </h4>
+
+                                                                                    <p style="font-size: 16px; margin-bottom: 7px; line-height: 1.6;">
+                                                                                            </p>
+                                        
+                                                                                    <span style="margin-left: 3px"> Há 3 ano(s) </span>
+                                         
+                                        
+                                        <div style="clear:both; padding-top: 0px; ">
+                                            <a href="/informa/767/nesta-segunda-feira-21-a-secret-ria-de-sa-de-parti" style="font-size: 14px" class="type-link1"> Continue lendo... </a>
+                                        </div>
+
+                                    </div>
+
+                                    </div>
+                                </div> 
+
+                                <div class='col-md-12' style='margin-bottom: 1em'></div>
+                                   
+<div class="col-md-4">
+                                    <div class="" style="margin-top: 10px; padding-bottom: 0; border-radius: 9px;">
+
+                                    <div style="border-radius: 10px;">
+                                    	<a href='/informa/769/20-de-novembro-dia-da-consci-ncia-negra'>		<img class='img-responsive' style='width:100%; height: 250px; margin-right:5px; background-color:;background-repeat:no-repeat; background-size: cover; object-fit: cover; background-position:center; margin-bottom: 0px; border-radius: 9px' src=/fotos/769/Img0_600x400.jpg> </img>	</a>                                    </div>
+
+                                    <div class="col-md-12" style="padding: 1.1em 0;">
+
+                                        <span class="tag_news"> #Cultura             </span>
+
+                                        <h4 class="data_h4" style="padding-block: 7px;">
+                                            <a class="LinkInforma3" href="/informa/769/20-de-novembro-dia-da-consci-ncia-negra">
+                                                <strong>20 de novembro - Dia da Consciência Negra</strong>                                            </a>
+                                        </h4>
+
+                                                                                    <p style="font-size: 16px; margin-bottom: 7px; line-height: 1.6;">
+                                                                                            </p>
+                                        
+                                                                                    <span style="margin-left: 3px"> Há 3 ano(s) </span>
+                                         
+                                        
+                                        <div style="clear:both; padding-top: 0px; ">
+                                            <a href="/informa/769/20-de-novembro-dia-da-consci-ncia-negra" style="font-size: 14px" class="type-link1"> Continue lendo... </a>
+                                        </div>
+
+                                    </div>
+
+                                    </div>
+                                </div> 
+
+                                
+                                   
+<div class="col-md-4">
+                                    <div class="" style="margin-top: 10px; padding-bottom: 0; border-radius: 9px;">
+
+                                    <div style="border-radius: 10px;">
+                                    	<a href='/informa/770/19-de-novembro-dia-nacional-da-bandeira'>		<img class='img-responsive' style='width:100%; height: 250px; margin-right:5px; background-color:;background-repeat:no-repeat; background-size: cover; object-fit: cover; background-position:center; margin-bottom: 0px; border-radius: 9px' src=/fotos/770/Img0_600x400.jpg> </img>	</a>                                    </div>
+
+                                    <div class="col-md-12" style="padding: 1.1em 0;">
+
+                                        <span class="tag_news"> #Cultura             </span>
+
+                                        <h4 class="data_h4" style="padding-block: 7px;">
+                                            <a class="LinkInforma3" href="/informa/770/19-de-novembro-dia-nacional-da-bandeira">
+                                                <strong>19 de novembro - Dia Nacional da Bandeira</strong>                                            </a>
+                                        </h4>
+
+                                                                                    <p style="font-size: 16px; margin-bottom: 7px; line-height: 1.6;">
+                                                                                            </p>
+                                        
+                                                                                    <span style="margin-left: 3px"> Há 3 ano(s) </span>
+                                         
+                                        
+                                        <div style="clear:both; padding-top: 0px; ">
+                                            <a href="/informa/770/19-de-novembro-dia-nacional-da-bandeira" style="font-size: 14px" class="type-link1"> Continue lendo... </a>
+                                        </div>
+
+                                    </div>
+
+                                    </div>
+                                </div> 
+
+                                
+                                   
+<div class="col-md-4">
+                                    <div class="" style="margin-top: 10px; padding-bottom: 0; border-radius: 9px;">
+
+                                    <div style="border-radius: 10px;">
+                                    	<a href='/informa/777/ii-semana-do-beb'>		<img class='img-responsive' style='width:100%; height: 250px; margin-right:5px; background-color:;background-repeat:no-repeat; background-size: cover; object-fit: cover; background-position:center; margin-bottom: 0px; border-radius: 9px' src=/fotos/777/Img0_600x400.jpg> </img>	</a>                                    </div>
+
+                                    <div class="col-md-12" style="padding: 1.1em 0;">
+
+                                        <span class="tag_news"> #AssistênciaSocial   </span>
+
+                                        <h4 class="data_h4" style="padding-block: 7px;">
+                                            <a class="LinkInforma3" href="/informa/777/ii-semana-do-beb">
+                                                <strong>II SEMANA DO BEBÊ</strong>                                            </a>
+                                        </h4>
+
+                                                                                    <p style="font-size: 16px; margin-bottom: 7px; line-height: 1.6;">
+                                                                                            </p>
+                                        
+                                                                                    <span style="margin-left: 3px"> Há 3 ano(s) </span>
+                                         
+                                        
+                                        <div style="clear:both; padding-top: 0px; ">
+                                            <a href="/informa/777/ii-semana-do-beb" style="font-size: 14px" class="type-link1"> Continue lendo... </a>
+                                        </div>
+
+                                    </div>
+
+                                    </div>
+                                </div> 
+
+                                <div class='col-md-12' style='margin-bottom: 1em'></div>
+                                   <div class='col-md-12' style='margin-top: 20px;'> <nav style='float: right;'>
+				  <ul class='pagination'>    <li class='active'>
+				      <a>
+				        <span aria-hidden='true'> 1 </span>
+				      </a>
+				    </li><li><a href='?cat=2&pagina=1'>2</a></li><li><a href='?cat=2&pagina=2'>3</a></li><li><a href='?cat=2&pagina=3'>4</a></li><li>
+                                    <a href='?cat=2&pagina=4' aria-label='Next'>
+                                        <span aria-hidden='true'>5</span>
+                                    </a>
+                                </li><li>
+                                    <a href='?cat=2&pagina=1' aria-label='Next'>
+                                        <span aria-hidden='true'><i class='fa fa-angle-right'></i></span>
+                                    </a>
+                                </li></ul>
+                            </nav></div>                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+        
+
+<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer>
+    function resetTurnstileIfNeeded() {
+        if (window.turnstile) { try { turnstile.reset(); } catch (e) {} }
+    }
+    window.addEventListener('pageshow', (event) => { if (event.persisted) { resetTurnstileIfNeeded(); } });
+    document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') { resetTurnstileIfNeeded(); } });
+</script>
+
+    <script src="/js/shortcuts.js"></script>
+    <script>
+        shortcut.add("Alt+H", function() {
+            window.location.assign("index.php");
+        });
+
+        shortcut.add("Alt+Shift+1", function() {
+            window.location.assign("acessibilidade.php");
+        });
+
+        shortcut.add("Alt+9", function() {
+            window.scrollTo(0, 0);
+        });
+
+        shortcut.add("Alt+C", function() {
+            window.location.href = '#ancora';
+        });
+    </script>
+
+
+
+    
+        
+        <section class="container">
+            <div class="" style="margin-top: 10px; ">
+                <div class='public_paginas' style="padding-bottom: 40px;">
+
+                    <div class="col-md-12">
+                        <h1 style="text-align: center; margin-bottom: 40px; font-size: 25px;">Qual o seu nível de satisfação com essa página?</h1>
+                    </div>
+                    <div class="col-md-12">
+                        <fieldset class="radio-image">
+                            <div class="col-md-1"></div>
+                            <div class="col-md-2">
+
+                                <label for="2" class="radio-satisfacao" id="nota2">
+                                    <i class="iconota-nota2" style="color: #c0392b;"></i>
+                                </label>
+                                </br>Muito insatisfeito
+                            </div>
+                            <div class="col-md-2">
+                                <label for="4" class="radio-satisfacao" id="nota4">
+                                    <i class="iconota-nota4" style="color: #d35400;"></i>
+                                </label>
+                                </br>Insatisfeito
+                            </div>
+                            <div class="col-md-2">
+                                <label for="6" class="radio-satisfacao" id="nota6">
+                                    <i class="iconota-nota6" style="color: #f39c12;"></i>
+                                </label>
+                                </br>Neutro
+                            </div>
+                            <div class="col-md-2">
+                                <label for="8" class="radio-satisfacao" id="nota8">
+                                    <i class="iconota-nota8" style="color: #2ecc71;"></i>
+                                </label>
+                                </br>Satisfeito
+                            </div>
+                            <div class="col-md-2">
+
+                                <label for="10" class="radio-satisfacao" id="nota10">
+                                    <i class="iconota-nota10" style="color: #27ae60;"></i>
+                                </label>
+                                </br>Muito satisfeito
+                            </div>
+                            <div class="col-md-1"></div>
+                        </fieldset>
+                    </div>
+
+                    <div class="col-md-12"></div>
+
+                    <div class="col-md-2"></div>
+                    <div class="col-md-8">
+                        <form id="FormSatisfacao" method="post" action="/data_satisfacao.php" style="display: none;">
+                            <div class="form-group">
+                                <label> Name </label>
+                                <input type="text" name="nome" class="form-control" id="nome" placeholder="Digite seu nome">
+                                <input type="hidden" name="nota" id="nota" required />
+                                <input type="hidden" name="VPagina" value="informa.php" />
+                                <input type="hidden" name="NRegistro" value="0" />
+                                <input type="hidden" name="LinkCompleto" value="/informa.php?cat=2" />
+                            </div>
+                            <div class="form-group">
+                                <label> Email </label>
+                                <input type="email" class="form-control" name="email" placeholder="Digite aqui seu email" />
+                            </div>
+                            <div class="form-group">
+                                <label> Mensagem </label>
+                                <textarea name="mensagem" class="form-control" rows="2"></textarea>
+                            </div>
+                            <div class="form-group">
+                            <div class="cf-turnstile" 
+                                data-sitekey="0x4AAAAAACVDg-gXYFoLhLIO" 
+                                data-callback="onTurnstileOk" 
+                                data-theme="light" >
+                            </div></div>
+                            <div class="form-group">
+                                <p style="line-height: 1.500; margin-bottom: 0px;">
+                                    *Prezado(a), esta avaliação não será analisada como manifestação de Ouvidoria. Servirá apenas para revisarmos e refletirmos sobre as informações disponíveis nesta página.
+                                </p>
+                                <p style="line-height: 1.500; margin-bottom: 0px;">
+                                    Esclarecemos que os dados fornecidos acima serão tratados com respeito à sua privacidade.
+                                </p>
+                                <p style="line-height: 1.500; margin-bottom: 0px;">
+                                    Seguindo a <strong><a target="blank" href="https://www.gov.br/cidadania/pt-br/acesso-a-informacao/lgpd">LGPD - Lei Geral de Proteção de Dados 13.709</a></strong>, de 14 de agosto de 2018.
+                                </p>
+                            </div>
+                            <div class="form-group">
+                                <button type="button" id="CancelSatisfacao" class="btn btn-primary" required="required"> <i class="fa fa-window-close" aria-hidden="true"></i> Cancelar</button>
+                                <button type="submit" name="submit" id="btnSend" class="btn btn-primary" required="required"><i class="fa fa-mouse-pointer" aria-hidden="true"></i> Enviar</button>
+                                <i class="fa fa-2x fa-spinner fa-spin load" style="display: none;"></i>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="col-md-2"></div>
+                    <div id="Return" class="col-md-12"> </div>
+
+                </div>
+            </div>
+        </section>
+
+
+    
+    <section class="container">
+        <div class="" style="margin-top: 10px; ">
+            <div class='public_paginas' style="padding-bottom: 0px;">
+                <div class="row">
+                    <div class="col-md-12">
+                        <a href="https://radardatransparencia.atricon.org.br/ " target="_blank">
+                            <img src="/imagens/radar_atricon.png" alt="Radar ATRICON" width="100%">
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+
+    <div id="scroll2"><a href="/atricon.php"><img src="/imagens/atricon48x48.png" title="Atricon"></a></div>
+    
+    <div id="scroll"><span></span></div>
+
+    
+    <div class="section" id="bottom" style="padding-bottom: 0px;">
+                <div class="gmaps" style="height: 150px;">
+            <iframe title='Mapa da cidade' src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3979.8612970293743!2d-40.7552359858929!3d-4.048705546017129!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x794dc59112cdded%3A0x5c1b5048791dcfc5!2sPrefeitura+Mun+de+Gra%C3%A7a!5e0!3m2!1spt-BR!2sbr!4v1451401006038" width="600" height="450" frameborder="0" style="border:0" allowfullscreen></iframe>
+
+        </div>
+                
+                
+ 
+
+<div style="display: flex; margin:0; margin-bottom: 5px;">
+       
+</div>      
+
+        
+                        <section>
+                    <div class="col-md-12  ">
+                        <div class="row fitaflex">
+                            <div class="col-md-2 fita" style="margin-bottom:0px; border-top: 9px solid; border-image: linear-gradient(45deg, #018747, #D2600B ) 1;"></div>
+                            <div class="col-md-2 fita" style="margin-bottom:0px; border-top: 9px solid; border-image: linear-gradient(45deg, #D2600B, #F48C40 ) 1;"></div>
+                            <div class="col-md-2 fita" style="margin-bottom:0px; border-top: 9px solid; border-image: linear-gradient(45deg, #F48C40, #018747 ) 1;"></div>
+                            <div class="col-md-2 fita" style="margin-bottom:0px; border-top: 9px solid; border-image: linear-gradient(45deg, #018747, #D2600B ) 1;"></div>
+                            <div class="col-md-2 fita" style="margin-bottom:0px; border-top: 9px solid; border-image: linear-gradient(45deg, #D2600B, #F48C40 ) 1;"></div>
+                            <div class="col-md-2 fita" style="margin-bottom:0px; border-top: 9px solid #F48C40;"></div>
+                        </div>
+                    </div>
+                </section>
+            
+        <div class="container wow fadeInDown" data-wow-duration="1000ms" data-wow-delay="600ms">
+
+            <div class="col-md-12" style="text-align: center; /* margin-bottom: 23px; */">
+
+                <div class='col-md-12' style='margin-block: 2em'><img src="/imagens/logovazada.png?time=1786928092" alt="logo" class="img__vazado"><br class='break-responsive'><a href='/selos' style='margin-left: 5px'><img style='width: 60px' src='/imagens/imagensselos/unicef-2021-2024-p.png' alt='Selo UNICEF 2021-2024' title='Selo UNICEF 2021-2024'></a><a href='/selos' style='margin-left: 5px'><img style='width: 60px' src='/imagens/imagensselos/alfa-ouro-p.png' alt='Selo Nacional compromisso com a Alfabetização Ouro 2024
+' title='Selo Nacional compromisso com a Alfabetização Ouro 2024
+'></a></div>                    <!-- 
+                        <a class="btn btn-primary btn-rodape text-35-char" href="#" title="clique aqui " style="margin-bottom: 10px;">
+                            <span class=""></span>                         </a> -->
+
+                
+                <h1 style="text-align: center; margin-bottom: 20px; color: #FFFFFF; font-size: 20px">
+                                    </h1>
+
+            </div>
+
+        </div>
+
+
+
+    </div>
+
+    <div id="footer" class="midnight-blue">
+        <div class="container" style="padding-top: 10px;">
+            <div class="col-md-12">
+                <div class="row">
+                    <div class="col-md-4">
+
+                        <p class="titulo-info-footer"><strong>
+                                Institucional<br></strong></p>
+
+                        
+                        <p class="PBottom"><i class='bi bi-person-circle'></i> Prefeito(a) Maria Iraldice de Alcântara</p>
+                                                <p class="PBottom"><i class='bi bi-postcard-fill'></i> CNPJ: 23.467.889/0001-17</p>
+                        <!--<p class="PBottom"><i class='fa fa-university'></i>  </p>-->
+                                            </div>
+
+                    <div class="col-md-4">
+
+                        <p class="titulo-info-footer"><strong>
+                                Contatos<br></strong></p>
+                                                <p><i class='bi bi-telephone-fill'></i> (88) 3656-1255</p>
+                        <p><i class='bi bi-envelope-at-fill'></i> gabineteprefeita@graca.ce.gov.br</p>
+
+                    </div>
+
+                    <div class="col-md-4 ">
+
+                        <p class="titulo-info-footer"><strong>
+                                Endereço e horário<br></strong></p>
+
+                        <p>
+                            <i class='bi bi-geo-alt-fill' aria-hidden='true'></i>
+                            Av. Jose Candido de Carvalho,
+
+                                                        483
+                                                            - Centro,
+
+                                                                62.365-000
+
+                        </p>
+                        <p>
+                            <i class='bi bi-clock-fill' aria-hidden='true'></i>
+                            Atendimento Ao Publico: Segunda A Sexta - das 07:30 As 11:30                        </p>
+                    </div>
+
+                                            <div class="col-md-12">
+                                                    </div>
+                    
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="rodape1">
+        <div class="container">
+            <div class="row social-links-top" style="justify-content: center; gap: 1em">
+
+                <a href='https://webmail-seguro.com.br/graca.ce.gov.br/' class='redesocial1' title='clique aqui E-mail' target='_blank'><i class='bi bi-envelope-fill'></i></a> <a href='https://www.facebook.com/prefeituramunicipaldegracace' class='redesocial1' title='clique aqui Facebook' target='_blank'><i class='bi bi-facebook'></i></a> <a href='https://www.instagram.com/prefeituradograca/' class='redesocial1' title='clique aqui Instagram'  target='_blank'><i class='bi bi-instagram'></i></a> 
+            </div>
+        </div>
+    </div>
+
+    <footer class="slider-principal" style="background: #1D7838; ">
+        <div class="container">
+            <div class="row">
+                <p style="text-align: center; flex-basis: auto; padding-right:0px; color: #fff; margin-top: 1em;">
+                    &copy; 2026 <a target='_blank' href='http://www.assesi.com.br/' title=''>Assesi</a>.
+                    Todos os Direitos Reservados.</p>
+
+            </div>
+        </div>
+            </footer>
+
+
+<script type="text/javascript">
+
+    // document.addEventListener('click', function(){
+    //     const link_before = event.target.closest('a');
+    //     const link_destino = (link_before) ? link_before.href : null;
+
+    //     const params_before = new URLSearchParams(link_before);
+    //     if (params_before.has('source')) {
+
+    //         localStorage.getItem('source', 'app');  
+    //     } else {
+    //         localStorage.removeItem('source');
+    //     }
+
+    // });
+
+</script>
+
+
+    <script src="/js/jquery-1.11.3.js"></script>
+    <script src="/js/tableExport.min.js"></script>
+    <script src="/js/FileSaver.min.js"></script>
+    <script src="/js/jquery.base64.js"></script>
+    <script src="/js/html2canvas.min.js"></script>
+    <script src="/js/sprintf.js"></script>
+    <script src="/js/jspdf.min.js"></script>
+    <script src="/js/jspdf.plugin.autotable.js"></script>
+    <script src="/js/base64.js"></script>
+    <script src="/js/bootstrap.min.js"></script>
+    <script src="/js/jquery.prettyPhoto.js"></script>
+    <script src="/js/jquery.isotope.min.js"></script>
+    <script src="/js/main.js"></script>
+    <script src="/js/wow.min.js"></script>
+    <script type="text/javascript" language="javascript" src="/js/jquery.maskedinput.min.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function() {
+
+            $("#dtini").mask("99/99/9999");
+            $("#dtfim").mask("99/99/9999");
+
+            
+
+            window.speechSynthesis.cancel();
+            $('#speak').click(function() {
+                if (window.speechSynthesis.speaking === true) {
+                    if (window.speechSynthesis.paused === true) {
+                        $('#speak').html('<i class="fa fa-pause"></i>');
+                        window.speechSynthesis.resume();
+                    } else {
+                        $('#speak').html('<i class="fa fa-play"></i>');
+                        window.speechSynthesis.pause();
+                    }
+                } else {
+                    var text = $('#speak_text').html();
+                    var msg = new SpeechSynthesisUtterance();
+                    var voices = window.speechSynthesis.getVoices();
+                    msg.voice = voices[416];
+                    msg.rate = 10 / 10;
+                    msg.pitch = 1;
+                    msg.text = text;
+                    msg.lang = 'PT-BR';
+                    var t;
+                    msg.onend = function(e) {
+                        console.log('Finished in ' + event.elapsedTime + ' seconds.');
+                    };
+                    $('#speak').html('<i class="fa fa-pause"></i>');
+                    speechSynthesis.speak(msg);
+                }
+            });
+
+            (function($) {
+
+                $('#filter').keyup(function() {
+
+                    var rex = new RegExp($(this).val(), 'i');
+                    $('.linha').hide();
+                    $('.linha').filter(function() {
+                        return rex.test($(this).text());
+                    }).show();
+                })
+
+            }(jQuery));
+
+
+
+
+        });
+    </script>
+    <script src="/js/jquery.font-accessibility.min.js"></script>
+    <script>
+        $(function() {
+            /* Custom buttons */
+            $('#font-setting-buttons').easyView({
+                container: 'body, #rels, #tablink, .row, #Noticia',
+                increaseSelector: '.increase-me',
+                decreaseSelector: '.decrease-me',
+                normalSelector: '.reset-me',
+                contrastSelector: '.change-me'
+            });
+        });
+    </script>
+
+</body>
+
+</html>
