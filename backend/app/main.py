@@ -3,7 +3,7 @@ import os
 import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-#primeira mudança
+#primeira mudançaW
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 from api.rotas import router as rotas_editais
