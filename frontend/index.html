@@ -212,7 +212,7 @@ https://prae.ufc.br/pt/</textarea>
     <!-- ======== LÓGICA JAVASCRIPT ======== -->
     <script>
         // 1. Endereço base do seu Codespace (Sem a rota específica ainda)
-        const API_BASE_URL = "https://cuddly-halibut-qwxgx4pq75rfj96-8000.app.github.dev";
+        const API_BASE_URL = "";
 
         // 2. Mapeia os elementos HTML que vamos interagir
         const btnForcarBusca = document.getElementById('btnForcarBusca');
@@ -240,8 +240,8 @@ https://prae.ufc.br/pt/</textarea>
 
             // CHAVES ATUALIZADAS para bater exatamente com o Pydantic / api/rotas.py
             const payload = {
-                user_id: "teste_engenharia_01",
-                email: "ismaelsilvaalmeida257@gmail.com",
+                user_id: "busca_manual_anonima", 
+                email: "anonimo@editaltracker.local",
                 target_sites: arraySites,
                 prompt_perfil: promptValue
             };
@@ -274,7 +274,7 @@ https://prae.ufc.br/pt/</textarea>
             // --- C. Comunicação Real com o FastAPI ---
             try {
                 // ROTA ATUALIZADA de acordo com api/rotas.py
-                const resposta = await fetch(`/api/api/editais/configurar`, {
+                const resposta = await fetch(`${API_BASE_URL}/api/editais/configurar`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
